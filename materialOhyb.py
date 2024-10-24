@@ -9,8 +9,8 @@ Created on 01/06/2017, 09:26
 @author: David Potucek
 '''
 
-import Python.misc.mathPhys as mathPhys
-import Python.misc.myTools as myTools
+import daptools.mathPhys as mathPhys
+import daptools.myTools as myTools
 
 if __name__ == "__main__":
     print('Zadej nasledující údaje pro výpočet materiálu na ohyb.')

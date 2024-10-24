@@ -10,7 +10,7 @@ Created on 22/02/2021, 14:03
 '''
 
 from math import sqrt
-from Python.misc.myTools import strEnumUsrIn, numUsrIn
+from daptools.myTools import strEnumUsrIn, numUsrIn
 
 def hloubkaPlosky(prumer, sirkaPlosky):
     h = prumer - sqrt((prumer/2)**2 - (sirkaPlosky/2)**2)

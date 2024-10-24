@@ -13,7 +13,7 @@ __outputFile__ = '/home/david/Downloads/ThreadOutput.txt'
 __DEBUG__ = False
 
 
-class MetricThread():
+class MetricThread:
 
     sily = (60, 65, 70, 75, 80, 85)
 
@@ -63,7 +63,8 @@ class MetricThread():
         dia = prumer - (stoupani * 1.083 * procenta / 100)
         return dia
 
-    def countTapDrillSingle(self, prumer, stoupani, procenta=75):         # static method class MetricThread
+    @staticmethod
+    def countTapDrillSingle(prumer, stoupani, procenta=75):         # static method class MetricThread
         """Stejna metoda jako countTapDrill(), ale urcena k pouziti bez konstrukce objektu MetricThread."""
         dia = prumer - (stoupani * 1.083 * procenta / 100)
         return dia
@@ -84,7 +85,7 @@ def putHeader(file):
     file.write('Soubor k zahrnuti do LaTeX tabulky. Use copy/paste.\n')
 
 if __name__ == "__main__":
-    # from misc.LaTeXHelper import generateTableRow
+    # from daptools.LaTeXHelper import generateTableRow
     # testCountDrill()      # overeni funkcnosti vypoctu
 
     pool = ThreadPool()

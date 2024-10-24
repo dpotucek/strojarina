@@ -21,7 +21,7 @@ def calculateDisksRadius(div, diam):
 
 
 if __name__ == "__main__":
-    import Python.misc.myTools as tools
+    import daptools.myTools as tools
     divisions = 14
     diameter = 112
     print('Program spocita prumer kotoucku ktere je potreba naskladat kolem disku daneho prumeru \naby se '

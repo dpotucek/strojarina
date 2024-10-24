@@ -73,7 +73,7 @@ def vyzkousejKombinace(cislo, tpi, mm, units = 'mm'):
 
 
 if __name__ == "__main__":
-    from Python.misc.myTools import readDataFile
+    from daptools.myTools import readDataFile
     import sys
     print('Program vybere kombinaci dvou dostupnych zavitu nutnuch pro pozadovane stoupani. \n'
           'viz https://en.wikipedia.org/wiki/Differential_screw')

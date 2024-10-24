@@ -54,7 +54,7 @@ def vypoctiPocetDer(deleni, ratio=__RATIO):
 
 
 if __name__ == '__main__':
-    from Python.misc.myTools import numUsrIn, strEnumUsrIn
+    from daptools.myTools import numUsrIn, strEnumUsrIn
     print('co chces vypocitat - pocty der v kotoucich nebo vypocist diry pro dosazeni deleni?')
     coChci = strEnumUsrIn('zadej bud p (pocty) nebo d (diry pro deleni? [d]', ('d', 'p'), 'd')
     if coChci == 'p':

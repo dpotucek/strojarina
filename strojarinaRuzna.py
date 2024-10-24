@@ -38,7 +38,7 @@ def sineBarRadius(delka, r1, uhel):
     VZOREC:     r2 = 2 * delka * sin(0.5 * uhel) + r1
     """
     import math
-    import Python.misc.mathPhys as mfz
+    import daptools.mathPhys as mfz
     return 2 * delka * math.sin(0.5 * mfz.deg2rad(uhel)) + r1
 
 

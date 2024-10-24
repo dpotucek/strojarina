@@ -6,12 +6,11 @@ Created on Oct 29, 2016
 @author: David Potucek
 '''
 
-# __FILE__ = "/Users/david/MySmallProjects/experiments/strojarina/FINDTHRD.DAT"
 __FILE__ = "FINDTHRD.DAT"
 
 class Thread():
     """Represents thread with parameters. Works with all threads. For metric threads only see
-    tappingDrills.py file, includes super class of Thread -> MetricTrhread.
+    tappingDrills.py file, includes super class of Thread -> MetricThread.
     Created by David on 29/10/2016
     """
 
@@ -234,7 +233,7 @@ class ThreadPool():
 
     def listMetricThreads(self):
         """Vrati metricke zavity v tuple."""
-        from Python.misc.myTools import contains as contain
+        from daptools.myTools import contains as contain
         metric = []
         for t in self.threadBin:
             if t.isMetric() and not contain(t.name, 'HOLTZ'):   # vyhazuji jine nez metricke a Holtzapfels zavity
@@ -242,7 +241,7 @@ class ThreadPool():
         return tuple(metric)
 
 def UIInint():
-    import Python.misc.myTools as myTools
+    import daptools.myTools as myTools
     unit = 'N/A'
     kriterium = 'N/A'
 
@@ -285,7 +284,7 @@ if __name__ == "__main__":
             print(v.name)
     else:
         print("None found!")
-    from Python.misc.myTools import strEnumUsrIn as userInput
+    from daptools.myTools import strEnumUsrIn as userInput
     vypis = userInput('would you like to display list of thread descriptions? \nIf so, input y, otherwise anything else:\n',
                       ('y', '?'), 'n')
     if vypis == 'y':

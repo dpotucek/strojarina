@@ -6,7 +6,7 @@ Created on 3.11.2016
 @author: David Potucek
 '''
 
-import Python.misc.myTools as tools
+import daptools.myTools as tools
 import math
 
 def getUserInput():
