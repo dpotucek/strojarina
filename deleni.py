@@ -17,32 +17,32 @@ __POCTY_DER = False
 __VYPOCET_KOTOUCE = True
 
 
-def prozkoumejDeleni(pocetDer, ratio=__RATIO):
+def prozkoumej_deleni(pocet_der, ratio=__RATIO):
     """Vypocte z pomeru delici hlavy a z poctu der v kotouci dosazitelna celociselna deleni.
-    :param pocetDer - pocet der v kotouci
+    :param pocet_der - pocet der v kotouci
     :param ratio  pomer delici hlavy - nastaveno na default __RATIO
     :return tuple celociselnych deleni"""
-    maxNum = pocetDer * ratio
+    max_num = pocet_der * ratio
     out = []
-    for iterator in range(1, int(maxNum)):
-        num = maxNum / iterator
+    for iterator in range(1, int(max_num)):
+        num = max_num / iterator
         if num.is_integer():
             out.append(int(num))
 
-        if iterator > maxNum:
+        if iterator > max_num:
             break
     return tuple(out)
 
 
-def vypoctiPocetDer(deleni, ratio=__RATIO):
+def vypocti_pocet_der(deleni, ratio=__RATIO):
     """Vypocte z pozadovaneho deleni pri danem pomeru hlavy pocet der.
     :param deleni pozadovane deleni
     :param ratio pomer delici hlavy - nastaveno na default __RATIO  """
     base = ratio / deleni
     prubezne = 1
     while True:
-        checkNum = base * prubezne
-        if checkNum.is_integer():
+        check_num = base * prubezne
+        if check_num.is_integer():
             break
         else:
             prubezne += 1
@@ -59,12 +59,12 @@ if __name__ == '__main__':
     coChci = strEnumUsrIn('zadej bud p (pocty) nebo d (diry pro deleni? [d]', ('d', 'p'), 'd')
     if coChci == 'p':
         for dira in __DIRY2:
-            deleni = prozkoumejDeleni(dira)
+            deleni = prozkoumej_deleni(dira)
             print('pro pocet der: {} (max: {}) \n {}'.format(dira, dira*__RATIO, deleni))
 
     if coChci == 'd':
         pozadDeleni = numUsrIn('zadej pozadovane deleni: ', 26)
-        pocetDer = vypoctiPocetDer(pozadDeleni)
+        pocetDer = vypocti_pocet_der(pozadDeleni)
         if pocetDer > 0:
             print('pro deleni {} je nutne mit pri pomeru hlavy {} obsazenych {} der v kotouci, '
                   'nebo celociselne nasobky tohoto cisla.'.format(pozadDeleni, __RATIO, pocetDer))

@@ -108,8 +108,8 @@ if __name__ == '__main__':
         """ Vypocte hloubku hrotu vrtaku na zaklade prumeru vrtaku a vrcholoveho uhlu."""
 
         print('Vypocet pridavku k hloubce diry pri vrtani.')
-        uhel = myTools.numUsrIn('zadej uhel cela vrtaku: ', 118)
-        prumer = myTools.numUsrIn('zadej prumer vrtaku: ', 10)
+        uhel = myTools.num_usr_in('zadej uhel cela vrtaku: ', 118)
+        prumer = myTools.num_usr_in('zadej prumer vrtaku: ', 10)
         hloubka = (prumer/2)/math.tan(mfz.deg2rad(uhel/2))
         print('hloubka hrotu vrtaku: {:.2f}'.format(hloubka))
 
