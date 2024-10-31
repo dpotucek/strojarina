@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on Oct 29, 2016
 
 @author: David Potucek
-'''
+"""
 
 __FILE__ = "FINDTHRD.DAT"
 
@@ -26,24 +26,24 @@ class Thread():
         self.depthInch = deI
         self.depthMM = dmm
 
-    def getPitch(self, mm = True):
+    def get_pitch(self, mm = True):
         """returns pitch of the thread, default in mm."""
         if mm: return self.pitchMM
         else: return self.pitchTPI
 
-    def getDiameter(self, mm = True):
+    def get_diameter(self, mm = True):
         """returns major diameter of the thread, default in mm."""
         if mm: return self.diaMM
         else: return self.diaInch
 
-    def getParamAll(self):
+    def get_param_all(self):
         """Returns all the parameters of the thread in touple.
         Sequence: name, major diameter[in], major diameter[mm], pitch[in], itch[mm],
         core diameter[in], core diameter[mm], depth[in], depth[mm].
         Last 4 parameters might not be available (N/A)."""
         return (self.name, self.diaInch, self.diaMM, self.pitchTPI, self.pitchMM, self.coreDia, self.coreMM, self.depthInch, self.coreMM)
 
-    def fitsDimension(self, cislo):
+    def fits_dimension(self, cislo):
         """Returns True iff any of major diameter or pitch in both mm or inch fits given dimension.
         :param cislo: number to compare thread with
         :return: True or False
@@ -59,7 +59,7 @@ class Thread():
         else:
             return False
 
-    def fitsMajorDiameter(self, cislo):
+    def fits_major_diameter(self, cislo):
         """Returns True iff major diameter (mm or in) fits given dimension.
         :param cislo: number to compare thread with
         :return: True or False
@@ -71,7 +71,7 @@ class Thread():
         else:
             return False
 
-    def fitsPitch(self, cislo):
+    def fits_pitch(self, cislo):
         """ Returns True iff pitch (mm or in) fits given dimension.
         :param cislo: number to compare thread with
         :return: True or False
@@ -83,7 +83,7 @@ class Thread():
         else:
             return False
 
-    def fitsMajorDiameterMM(self, cislo):
+    def fits_major_diameter_mm(self, cislo):
         """Returns True iff true diameter in mm fits given dimension.
         :param cislo: number to compare thread with
         :return: True or False"""
@@ -92,7 +92,7 @@ class Thread():
         else:
             return False
 
-    def fitsMajorDiameterIn(self, cislo):
+    def fits_major_diameter_in(self, cislo):
         """Returns True iff true diameter in in fits given dimension.
         :param cislo: number to compare thread with
         :return: True or False
@@ -102,7 +102,7 @@ class Thread():
         else:
             return False
 
-    def fitsPitchMM(self, cislo):
+    def fits_pitch_mm(self, cislo):
         """Returns True iff pitch in mm fits given dimension.
         :param cislo:
         :return: True/False
@@ -112,7 +112,7 @@ class Thread():
         else:
             return False
 
-    def fitsPitchTPI(self, cislo):
+    def fits_pitch_tpi(self, cislo):
         """Returns True iff pitch in mm fits given dimension.
         :param cislo:
         :return: True/False
@@ -122,7 +122,7 @@ class Thread():
         else:
             return False
 
-    def isMetric(self):
+    def is_metric(self):
         """Returns true if thread is metric."""
         if self.name[0] == 'M':
             return True
@@ -136,49 +136,49 @@ class Thread():
         ' mm;\t' + str(self.coreDia) + ' in\n' + 'depth =\t\t\t\t' + str(self.depthMM) + ' mm;\t' + str(self.depthInch) + ' in\n')
         return str(strX)
 
-class ThreadPool():
+class ThreadPool:
     """Reads all threads from source file FINDTHRD.TXT and allows operations on this collection."""
 
     def __init__(self):
-        self.threadBin, self.threadData = self.readUpData()  # fill the bin with threads from the file
+        self.threadBin, self.threadData = self.read_up_data()  # fill the bin with threads from the file
 
-    def searchThreads(self, cislo, units = 'mm', kriterium='pitch'):
+    def search_threads(self, cislo, units ='mm', kriterium='pitch'):
         """Searches threads in kos container for cislo."""
         fit = []
         if units == 'mm' or units == 'tpi' or kriterium == 'pitch' or kriterium == 'diameter':
             if kriterium == 'diameter':
                 if units == 'mm':
                     for t in self.threadBin:
-                        if t.fitsMajorDiameterMM(cislo):
+                        if t.fits_major_diameter_mm(cislo):
                             fit.append(t)
                 else:
                     for t in self.threadBin:
-                        if t.fitsMajorDiameterIn(cislo):
+                        if t.fits_major_diameter_in(cislo):
                             fit.append(t)
             else:           # kriterium == 'pitch'
                 if units == 'mm':
                     for t in self.threadBin:
-                        if t.fitsPitchMM(cislo):
+                        if t.fits_pitch_mm(cislo):
                             fit.append(t)
                 else:
                     for t in self.threadBin:
-                        if t.fitsPitchTPI(cislo):
+                        if t.fits_pitch_tpi(cislo):
                             fit.append(t)
         else:
             raise ValueError("expected diameter or pitch in mm or in, got: " + kriterium + ' ' + units)
         return fit
 
-    def readUpData(self):
+    def read_up_data(self):
         """Reads data from file, creates threads and returns thread tuple."""
-        threads, data = self.openDataFile()  # v threads jsou jmena zavitu, v data jsou data zavitu
+        threads, data = self.open_data_file()  # v threads jsou jmena zavitu, v data jsou data zavitu
         seznam = []
         for t in data:
             if t == '\n': continue
-            thread = self.extractThread(t)
+            thread = self.extract_thread(t)
             seznam.append(thread)  # naplneny list threadu
         return tuple(seznam), threads
 
-    def openDataFile(self):
+    def open_data_file(self):
         """Reads file FINDTHRD.TXT."""
         dataLines = []
         types = []
@@ -197,7 +197,7 @@ class ThreadPool():
                 counter += 1
         return tuple(types), tuple(dataLines)
 
-    def extractThread(self, t):
+    def extract_thread(self, t):
         """extracts information from file line and returns new Thread"""
         n = t[0:11].strip()         # thread name
         di = t[12:19].strip()       # diameter [in]
@@ -227,20 +227,20 @@ class ThreadPool():
         else:                           # all other threads
             return Thread(n, float(di), float(dmm), float(ptp), float(pmm), cd, cmm, din, dmmd)
 
-    def listThreads(self):
+    def list_threads(self):
         for th in self.threadData:
             print(th)
 
-    def listMetricThreads(self):
+    def list_metric_threads(self):
         """Vrati metricke zavity v tuple."""
         from daptools.myTools import contains as contain
         metric = []
         for t in self.threadBin:
-            if t.isMetric() and not contain(t.name, 'HOLTZ'):   # vyhazuji jine nez metricke a Holtzapfels zavity
+            if t.is_metric() and not contain(t.name, 'HOLTZ'):   # vyhazuji jine nez metricke a Holtzapfels zavity
                 metric.append(t)
         return tuple(metric)
 
-def UIInint():
+def ui_inint():
     import daptools.myTools as myTools
     unit = 'N/A'
     kriterium = 'N/A'
@@ -256,7 +256,7 @@ def UIInint():
 if __name__ == "__main__":
 
 
-    cislo, units, kriterium = UIInint()
+    cislo, units, kriterium = ui_inint()
 
     if units == 'mm':
         print('looking for metric threads', end="")
@@ -277,7 +277,7 @@ if __name__ == "__main__":
         kriterium = 'pitch'
 
     threads = ThreadPool()    # fill the bin with threads from the file
-    vysl = threads.searchThreads(cislo, units, kriterium)
+    vysl = threads.search_threads(cislo, units, kriterium)
 
     if vysl:
         for v in vysl:
@@ -288,4 +288,4 @@ if __name__ == "__main__":
     vypis = userInput('would you like to display list of thread descriptions? \nIf so, input y, otherwise anything else:\n',
                       ('y', '?'), 'n')
     if vypis == 'y':
-        threads.listThreads()
+        threads.list_threads()

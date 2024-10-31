@@ -1,18 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 differentialThread
 Created on 3.11.2016
 Program vybere kombinaci dvou dostupnych zavitu nutnuch pro pozadovane stoupani.
 viz https://en.wikipedia.org/wiki/Differential_screw
 
 @author: David Potucek
-'''
+"""
 
-# __dataFile__ = '/Users/david/MySmallProjects/experiments/strojarina/DIFFTHRD.DAT'
 __dataFile__ = "DIFFTHRD.DAT"
 
-def parseData(radky):
+def parse_data(radky):
     tpi = []
     mm = []
     mms = False
@@ -32,21 +31,21 @@ def parseData(radky):
             tpi.append(cislo)
     return tuple(tpi), tuple(mm)
 
-def calculateDiffThread(stoupaniHrube, stoupaniJemne):
+def calculate_diff_thread(stoupani_hrube, stoupani_jemne):
     """
     Counts real effective pitch of the thread based on 2 supplied standard pitches.
-    :param stoupaniHrube: pitch of thread 1
-    :param stoupaniJemne: pitch of thread 2
+    :param stoupani_hrube: pitch of thread 1
+    :param stoupani_jemne: pitch of thread 2
     :return: Pe: effective pitch of differential thread
     """
-    if stoupaniHrube == 0 or stoupaniJemne == 0:
+    if stoupani_hrube == 0 or stoupani_jemne == 0:
         raise ValueError('got zero argument')
-    if stoupaniHrube == stoupaniJemne:
+    if stoupani_hrube == stoupani_jemne:
         raise ValueError('differential thread requires different pitches.')
-    Pe = 1 / ((1 / stoupaniHrube) - (1 / stoupaniJemne))
+    Pe = 1 / ((1 / stoupani_hrube) - (1 / stoupani_jemne))
     return abs(Pe)
 
-def __combineVariants(cislo, values):
+def __combine_variants(cislo, values):
     vysledek = []
     best = 3e6
 
@@ -54,20 +53,20 @@ def __combineVariants(cislo, values):
         for fine in values:
             if coarse == fine or coarse < fine:
                 continue
-            pe = calculateDiffThread(coarse, fine)
+            pe = calculate_diff_thread(coarse, fine)
             d = abs(cislo - pe)
             if d <= best:
                 vysledek = (coarse, fine, pe)
                 best = d
     return vysledek
 
-def vyzkousejKombinace(cislo, tpi, mm, units = 'mm'):
+def vyzkousej_kombinace(cislo, tpi, mm, units ='mm'):
     if units == 'mm':
-        vysledek = __combineVariants(cislo, mm)
+        vysledek = __combine_variants(cislo, mm)
     elif units == 'in':
-        vysledek = __combineVariants(cislo, tpi)
+        vysledek = __combine_variants(cislo, tpi)
     else:
-        vysledek = __combineVariants(cislo, mm + tpi)
+        vysledek = __combine_variants(cislo, mm + tpi)
     return vysledek
 
 
@@ -78,7 +77,7 @@ if __name__ == "__main__":
     print('Program vybere kombinaci dvou dostupnych zavitu nutnuch pro pozadovane stoupani. \n'
           'viz https://en.wikipedia.org/wiki/Differential_screw')
     lines = readDataFile(__dataFile__)
-    stoupaniTPI, stoupaniMM = parseData(lines)  # ve stoupanich jsou data pro palcova a metricka stoupani
+    stoupaniTPI, stoupaniMM = parse_data(lines)  # ve stoupanich jsou data pro palcova a metricka stoupani
     print('read {} items'.format(len(stoupaniTPI) + len(stoupaniMM)))
 
     zadanyZavit = 1.8
@@ -94,9 +93,9 @@ if __name__ == "__main__":
         print('Tohle si můžeš vytočit sám, máš na to nástroje!.')
         sys.exit(0)
     if jednotky == 'mm' or jednotky == 'in':
-        kombinace = vyzkousejKombinace(zadanyZavit, stoupaniTPI, stoupaniMM, jednotky)
+        kombinace = vyzkousej_kombinace(zadanyZavit, stoupaniTPI, stoupaniMM, jednotky)
     else:
-        kombinace = vyzkousejKombinace(zadanyZavit, stoupaniTPI, stoupaniMM)
+        kombinace = vyzkousej_kombinace(zadanyZavit, stoupaniTPI, stoupaniMM)
 
     cThread = kombinace[0]
     fThread = kombinace[1]
@@ -123,9 +122,9 @@ if __name__ == "__main__":
         fNutThic = float(input('zadej tloušťku jemné (pohyblivé) matky:  \n'))
         motion = float(input('zadej požadovaný pohyb :  \n'))
     except ValueError:
-        print('nezadal jsi požadované údaje, beru default:\n',\
-              'hrubá matka: ', cNutThic, ' ',jednotky, '\n',\
-              'jemná matka: ', fNutThic, ' ', jednotky,'\n',\
+        print('nezadal jsi požadované údaje, beru default:\n',
+              'hrubá matka: ', cNutThic, ' ',jednotky, '\n',
+              'jemná matka: ', fNutThic, ' ', jednotky,'\n',
               'požadovaný pohyb: ', motion, ' ', jednotky, '\n')
 
     print('efektivní stoupání: {:.2f} {}'.format(ePitch, jednotky))

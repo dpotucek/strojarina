@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 tappingDrills produkuje soubor zavitu a vrtaku k zahrnuti do LaTeX tabulky.
 Soubor obsahuje udaje o zavitu a vrtaky pro ruzne sily zavitu.
 Created on 05/10/2017, 13:39
 
 @author: David Potucek
-'''
+"""
 from findThread import ThreadPool
 
 __outputFile__ = '/home/david/Downloads/ThreadOutput.txt'
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     # testCountDrill()      # overeni funkcnosti vypoctu
 
     pool = ThreadPool()
-    metric = pool.listMetricThreads()
+    metric = pool.list_metric_threads()
     depthThreads = []
     for t in metric:
         depthThreads.append(MetricThread(t))

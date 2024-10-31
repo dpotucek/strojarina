@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 program pro vypocet parametru vroubkovani.
 Created on 20/02/2020, 11:27
 
 @author: David Potucek
-'''
+"""
 
 from math import pi, floor
 
@@ -17,26 +17,21 @@ PITCHES = {2.0: 'P', 1.6:'D', 1.2:'P', 1.0: 'P', 0.8: 'P', 0.4:'S'}
 
 EPSILON = 0.01
 
-def countKnurlingAmerican(wheelDia, numOfTeeth, pieceDia):
+def count_knurling_american(wheelDia, numOfTeeth, pieceDia):
     deltaK = pi * wheelDia / numOfTeeth       # roztec zubu kolecka
     crestNum = floor(pi * pieceDia / deltaK)
     return deltaK, crestNum
 
-def countCrestNum4Dia(roztecKolecka, prumerKusu):
+def count_crest_num4_dia(roztecKolecka, prumerKusu):
     pocetVrypu = floor(pi * prumerKusu / roztecKolecka)
     potrebnyObvodKusu = pocetVrypu * roztecKolecka
     idealniOradlovani = potrebnyObvodKusu / pi
     return(pocetVrypu, potrebnyObvodKusu, idealniOradlovani)
 
 if __name__ == "__main__":
-    # for polozka in PITCHES:
-    #     print('polozka = {}: {}'.format(polozka, PITCHES[polozka]))
-
     roztec = 2
-
-    # pieceDia = MTools.numUsrIn('zadej nominalni prumer kusu k radlovani: ', 30)
     pieceDia = 30
-    pocetVrypu, potrebnyObvod, idealniObvod = countCrestNum4Dia(roztec, pieceDia)
+    pocetVrypu, potrebnyObvod, idealniObvod = count_crest_num4_dia(roztec, pieceDia)
 
     print('----------------- Vysledky --------------------')
     print('Pro kus o prumeru: {} mm'. format(pieceDia))

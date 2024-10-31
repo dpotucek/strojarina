@@ -1,6 +1,6 @@
 #!/usr/bin/python 3
 # -*- coding: utf-8 -*-
-'''
+"""
 Spocita parametry dvou remenic a delku remene.
 Poskytuje dve metody: calculate2Pulleys() a findDrivenDiameter().
 
@@ -13,7 +13,7 @@ hnane remenice vrati prumer hnane tak aby mela pozadovane otacky.
 Created on 28/06/2018, 10:38
 
 @author: David Potucek
-'''
+"""
 
 from math import pi as pi
 
@@ -23,26 +23,26 @@ drivenDia = 18
 distance = 65
 
 
-def calculate2Pulleys(RPM, driverDia, drivenDia, distance):
+def calculate2_pulleys(RPM, driverDia, drivenDia, distance):
     rpm = RPM * (driverDia/drivenDia)
     length = ((pi * driverDia)/2) + ((pi * drivenDia)/2 + (2*distance))
     return (rpm, length)
 
-def findDrivenDiameter(RPMDriver, RPMRequest, driverDia):
+def find_driven_diameter(RPMDriver, RPMRequest, driverDia):
     if RPMDriver == RPMRequest:
         return driverDia
     else:
         return RPMDriver * driverDia / RPMRequest
 
-def testPulley():
+def test_pulley():
     print('\n******************** testovaci run ********************')
     print('pro prumer hnaci remenice o prumeru {} cm, otacky {} RPM,'.format(driverDia, driverRPM))
     print('prumeru hnane remenice {} cm a vzdalenosti stredu remenic od sebe {} cm'.format(drivenDia, distance))
-    otacky, delka = calculate2Pulleys(driverRPM, driverDia, drivenDia, distance)
+    otacky, delka = calculate2_pulleys(driverRPM, driverDia, drivenDia, distance)
     print('vychazi: otacky hnane remenice: {:.2f} RPM, delka remene: {:.2f} cm'.format(otacky, delka))
     print('')
     print('******************** zpetne ********************')
-    prumer = findDrivenDiameter(driverRPM, 805, driverDia)
+    prumer = find_driven_diameter(driverRPM, 805, driverDia)
     print('pro remenici o prumeru {} a otackach {} hledame prumer hnane remenice abychom dosahli otacek 805 RPM'.
           format(driverDia, driverRPM))
     print('melo by vyjit neco kolem 18 cm viz vyse, vychazi {:.2f} cm.'.format(prumer))
@@ -51,6 +51,5 @@ def testPulley():
 
 
 if __name__ == "__main__":
-
-    testPulley()
+    test_pulley()
 

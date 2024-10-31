@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 Created on Jul 2, 2015
 Vypocet ruznych velicin pro strojarinu. Rizeno pomoci konstant na zacatku.
 
 @author: david
-'''
+"""
 # -------- sine bar variables ---------------
 __SINE_BAR = False
 __DELKA = 100  # vzdalenost os valecku [mm]
@@ -26,7 +26,7 @@ __TLOUSTKA_STENY_V = 6                  # tloustka steny mezi dirou a okrajem di
 __DALLOW = True
 
 
-def sineBarRadius(delka, r1, uhel):
+def sine_bar_radius(delka, r1, uhel):
     """Vypocet polomeru valcu pro nastaveni pozadovaneho uhlu.
     IN:
         delka = vzdalenost os valecku
@@ -42,7 +42,7 @@ def sineBarRadius(delka, r1, uhel):
     return 2 * delka * math.sin(0.5 * mfz.deg2rad(uhel)) + r1
 
 
-def revolverRegular(holes, diameter, spacing, wall):
+def revolver_regular(holes, diameter, spacing, wall):
     """ Spocita prumer materialu a radius na kterem se maji vrtat diry pro stejny prumer der.
     IN:
         holes       - pozadovany pocet der
@@ -57,7 +57,7 @@ def revolverRegular(holes, diameter, spacing, wall):
     return (r, rr)
 
 
-def variableRevolver(holes, spacing, wall):
+def variable_revolver(holes, spacing, wall):
     """Spocita prumer materialu a radius na kterem se maji vrtat diry pro pripad ruznych prumeru der.
     IN:
         holes       - pole prumeru der
@@ -77,12 +77,12 @@ def variableRevolver(holes, spacing, wall):
 
 
 if __name__ == '__main__':
-    if __SINE_BAR: print(sineBarRadius(__DELKA, __R1, 10))
+    if __SINE_BAR: print(sine_bar_radius(__DELKA, __R1, 10))
 
     if __REVOLVER:
         import math as m
         print("!Revolver stejne diry!")
-        v = revolverRegular(__NO_HOLES, __HOLE_DIAM, __SPACING, __TLOUSTKA_STENY)
+        v = revolver_regular(__NO_HOLES, __HOLE_DIAM, __SPACING, __TLOUSTKA_STENY)
         print("presny vysledek: ", v)
         vysledky = []
         for num in v:
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     if __VREVOLVER:
         from math import ceil as c
         print("!Revolver nestejne diry!")
-        v =(variableRevolver(__HOLES, __SPACING_V, __TLOUSTKA_STENY_V))
+        v =(variable_revolver(__HOLES, __SPACING_V, __TLOUSTKA_STENY_V))
         print("presny vysledek: ", v)
         vysledky = []
         for num in v:
@@ -103,8 +103,8 @@ if __name__ == '__main__':
 
     if __DALLOW:
         import math
-        import Python.misc.myTools as myTools
-        import Python.misc.mathPhys as mfz
+        import daptools.myTools as myTools
+        import daptools.mathPhys as mfz
         """ Vypocte hloubku hrotu vrtaku na zaklade prumeru vrtaku a vrcholoveho uhlu."""
 
         print('Vypocet pridavku k hloubce diry pri vrtani.')

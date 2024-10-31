@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-'''
+"""
 materialOhyb - jak dlouhy material o dane tloustce budu potrebovat na
 ohyb o polomeru x? Quick & dirty solution!! Funguje pro ocel, ostatni jsem nezkousel.
 
 Created on 01/06/2017, 09:26
 
 @author: David Potucek
-'''
+"""
 
 import daptools.mathPhys as mathPhys
 import daptools.myTools as myTools
@@ -26,9 +26,9 @@ if __name__ == "__main__":
 
     x = 0.4 * tloustka
 
-    if (radius < (2 * tloustka)):
+    if radius < (2 * tloustka):
         x = 0.3333 * tloustka
-    if (radius > (4 * tloustka)):
+    if radius > (4 * tloustka):
         x = 0.5 * tloustka
 
     pridavek = ang * (radius + x)
