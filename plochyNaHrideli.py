@@ -10,7 +10,7 @@ Created on 22/02/2021, 14:03
 """
 
 from math import sqrt
-from daptools.myTools import strEnumUsrIn, numUsrIn
+from daptools.myTools import str_enum_usr_in, num_usr_in
 
 def hloubka_plosky(prumer, sirka_plosky):
     h = prumer - sqrt((prumer/2) ** 2 - (sirka_plosky / 2) ** 2)
@@ -23,16 +23,16 @@ if __name__ == "__main__":
     defaultPrumer = 25
     defaultSirkaPlosky = 7
     varianty = ('c', 'p')
-    choice = strEnumUsrIn('chces spocitat ctverec {zadej c, nebo nic}, nebo plošku na hřídeli {zadej p}', varianty, 'c')
+    choice = str_enum_usr_in('chces spocitat ctverec {zadej c, nebo nic}, nebo plošku na hřídeli {zadej p}', varianty, 'c')
     if choice == 'c':           # pocitame ctverec
         print('počítáme čtverec na hřídeli.')
-        prumer = numUsrIn('Zadej průměr hřídele: ', defaultPrumer)
+        prumer = num_usr_in('Zadej průměr hřídele: ', defaultPrumer)
         hloubkaRezu = hloubka_ctverce(prumer)
         print('Pro průměr hřídele {}mm je hloubka řezu čtverce {:3.2f}mm'.format(prumer, hloubkaRezu))
     else:
         print('počítáme plošku na hřídeli.')
-        prumer = numUsrIn('Zadej průměr hřídele: ', defaultPrumer)
-        sirkaPlosky = numUsrIn('Zadej šířku plošky: ', defaultSirkaPlosky)
+        prumer = num_usr_in('Zadej průměr hřídele: ', defaultPrumer)
+        sirkaPlosky = num_usr_in('Zadej šířku plošky: ', defaultSirkaPlosky)
         hloubkaRezu = hloubka_plosky(prumer, sirkaPlosky)
         print('Pro průměr hřídele {}mm a šířku plošky {}mm je hloubka řezu {:3.2f}'.
               format(prumer, sirkaPlosky, hloubkaRezu))

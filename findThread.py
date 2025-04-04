@@ -241,15 +241,15 @@ class ThreadPool:
         return tuple(metric)
 
 def ui_inint():
-    import daptools.myTools as myTools
+    from daptools.myTools import str_enum_usr_in, num_usr_in
     unit = 'N/A'
     kriterium = 'N/A'
 
-    unit = myTools.strEnumUsrIn("would you like to search for in or mm values? Enter in or mm.",
-                                ('mm', 'in'), 'mm')
-    kriterium = myTools.strEnumUsrIn("would you like to search for diameter of pitch? Enter d or p:",
-                                     ('d', 'p'), 'd')
-    cislo = myTools.numUsrIn("please type value of the thread to search for", 10)
+    unit = str_enum_usr_in("would you like to search for in or mm values? Enter in or mm.",
+                        ('mm', 'in'), 'mm')
+    kriterium = str_enum_usr_in("would you like to search for diameter of pitch? Enter d or p:",
+                             ('d', 'p'), 'd')
+    cislo = num_usr_in("please type value of the thread to search for", 10)
     return cislo, unit, kriterium
 
 
@@ -284,7 +284,7 @@ if __name__ == "__main__":
             print(v.name)
     else:
         print("None found!")
-    from daptools.myTools import strEnumUsrIn as userInput
+    from daptools.myTools import str_enum_usr_in as userInput
     vypis = userInput('would you like to display list of thread descriptions? \nIf so, input y, otherwise anything else:\n',
                       ('y', '?'), 'n')
     if vypis == 'y':

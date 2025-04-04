@@ -54,16 +54,16 @@ def vypocti_pocet_der(deleni, ratio=__RATIO):
 
 
 if __name__ == '__main__':
-    from daptools.myTools import numUsrIn, strEnumUsrIn
+    from daptools.myTools import num_usr_in, str_enum_usr_in
     print('co chces vypocitat - pocty der v kotoucich nebo vypocist diry pro dosazeni deleni?')
-    coChci = strEnumUsrIn('zadej bud p (pocty) nebo d (diry pro deleni? [d]', ('d', 'p'), 'd')
+    coChci = str_enum_usr_in('zadej bud p (pocty) nebo d (diry pro deleni? [d]', ('d', 'p'), 'd')
     if coChci == 'p':
         for dira in __DIRY2:
             deleni = prozkoumej_deleni(dira)
             print('pro pocet der: {} (max: {}) \n {}'.format(dira, dira*__RATIO, deleni))
 
     if coChci == 'd':
-        pozadDeleni = numUsrIn('zadej pozadovane deleni: ', 26)
+        pozadDeleni = num_usr_in('zadej pozadovane deleni: ', 26)
         pocetDer = vypocti_pocet_der(pozadDeleni)
         if pocetDer > 0:
             print('pro deleni {} je nutne mit pri pomeru hlavy {} obsazenych {} der v kotouci, '

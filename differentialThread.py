@@ -72,11 +72,11 @@ def vyzkousej_kombinace(cislo, tpi, mm, units ='mm'):
 
 
 if __name__ == "__main__":
-    from daptools.myTools import readDataFile
+    from daptools.myTools import read_data_file
     import sys
     print('Program vybere kombinaci dvou dostupnych zavitu nutnuch pro pozadovane stoupani. \n'
           'viz https://en.wikipedia.org/wiki/Differential_screw')
-    lines = readDataFile(__dataFile__)
+    lines = read_data_file(__dataFile__)
     stoupaniTPI, stoupaniMM = parse_data(lines)  # ve stoupanich jsou data pro palcova a metricka stoupani
     print('read {} items'.format(len(stoupaniTPI) + len(stoupaniMM)))
 
