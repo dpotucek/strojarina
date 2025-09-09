@@ -6,6 +6,9 @@ Created on 3.11.2016
 @author: David Potucek
 """
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
 import daptools.myTools as tools
 import math
 
@@ -13,13 +16,13 @@ def get_user_input():
     m = 'c'
     a = 15
     cyl = 20
-    m = tools.strEnumUsrIn('do you want to use link method or method of contacting cylinders?: ', ('l', 'c'), m)
-    a = tools.numUsrIn("required angle?: ", a)
-    cyl = tools.numUsrIn('size of the bigger cylinder?: ', cyl)
+    m = tools.str_enum_usr_in('do you want to use link method or method of contacting cylinders?: ', ('l', 'c'), m)
+    a = tools.num_usr_in("required angle?: ", a)
+    cyl = tools.num_usr_in('size of the bigger cylinder?: ', cyl)
     return m, a, cyl
 
 def calculate_link_sine_bar(angle, cyl):
-    rozvor = tools.numUsrIn('cylinder center distance?:', 3)
+    rozvor = tools.num_usr_in('cylinder center distance?:', 3)
     prumer = 2 * rozvor * math.sin(0.5 * math.radians(angle)) + cyl
     print('size of bigger cylinder {} and distance between centers of {}'.format(cyl, rozvor))
     print('smaller cylinder diameter to obtain angle of {} is {}.'.format(angle, prumer))

@@ -38,6 +38,9 @@ def sine_bar_radius(delka, r1, uhel):
     VZOREC:     r2 = 2 * delka * sin(0.5 * uhel) + r1
     """
     import math
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
     import daptools.mathPhys as mfz
     return 2 * delka * math.sin(0.5 * mfz.deg2rad(uhel)) + r1
 
@@ -103,6 +106,9 @@ if __name__ == '__main__':
 
     if __DALLOW:
         import math
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
         import daptools.myTools as myTools
         import daptools.mathPhys as mfz
         """ Vypocte hloubku hrotu vrtaku na zaklade prumeru vrtaku a vrcholoveho uhlu."""

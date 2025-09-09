@@ -9,8 +9,46 @@ Created on 05/10/2017, 13:39
 """
 from findThread import ThreadPool
 
-__outputFile__ = '/home/david/Downloads/ThreadOutput.txt'
-__DEBUG__ = False
+
+class TappingDrills:
+    """Trida pro vypocty vrtaku pro zavity."""
+    
+    def __init__(self, output_file='/home/david/Downloads/ThreadOutput.txt', debug=False):
+        self.output_file = output_file
+        self.debug = debug
+        
+    def test_count_drill(self):
+        print('test spravnosti funkce')
+        prcnt = 60
+        prum = 4.0
+        stoup = 0.7
+        vrtak = MetricThread.countTapDrillSingle(prum, stoup, prcnt)
+        print('pro zavit {0} se stroupanim {1} a silou zavitu {2}% pouzij vrtak {3:.2f}'.format(prum, stoup, prcnt, vrtak))
+        print('spravny vysledek je: 3.55 mm')
+        
+    def put_header(self, file):
+        file.write('Soubor k zahrnuti do LaTeX tabulky. Use copy/paste.\n')
+        
+    def generate_output(self):
+        pool = ThreadPool()
+        metric = pool.list_metric_threads()
+        depth_threads = []
+        for t in metric:
+            depth_threads.append(MetricThread(t))
+
+        depth_threads.sort()
+        with open(self.output_file, 'w+') as file:
+            self.put_header(file)
+            for d in depth_threads:
+                if self.debug:
+                    print('{} & {:.2f} & {} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f}\\\\\\\\'.format(d.name,
+                        float(d.pitchMM), d.coreMM, float(d.getDrill(60)), float(d.getDrill(65)),
+                        float(d.getDrill(70)), float(d.getDrill(75)), float(d.getDrill(80)), float(d.getDrill(85))))
+
+                file.write('{} & {:.2f} & {} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f}\\\\\\\\\n'.format(d.name,
+                    float(d.pitchMM), d.coreMM, float(d.getDrill(60)), float(d.getDrill(65)),
+                    float(d.getDrill(70)), float(d.getDrill(75)), float(d.getDrill(80)), float(d.getDrill(85))))
+            print('file {} written!'.format(self.output_file))
 
 
 class MetricThread:
@@ -18,7 +56,7 @@ class MetricThread:
     sily = (60, 65, 70, 75, 80, 85)
 
     def __init__(self, thread):
-        self.vrtaky = []        # vrtaky pro standardni sily zavitu - predpocitane
+        self.vrtaky = []
         self.thread = thread
         self.name = thread.name
         self.diaInch = thread.diaInch
@@ -64,49 +102,19 @@ class MetricThread:
         return dia
 
     @staticmethod
-    def countTapDrillSingle(prumer, stoupani, procenta=75):         # static method class MetricThread
+    def countTapDrillSingle(prumer, stoupani, procenta=75):
         """Stejna metoda jako countTapDrill(), ale urcena k pouziti bez konstrukce objektu MetricThread."""
         dia = prumer - (stoupani * 1.083 * procenta / 100)
         return dia
 
-    def __lt__(self, other):        # metoda less then. Pouzivano pro porovnavani instanci Thread
+    def __lt__(self, other):
         return self.diaMM < other.diaMM
 
-def testCountDrill():
-    print('test spravnosti funkce')
-    prcnt = 60
-    prum = 4.0
-    stoup = 0.7
-    vrtak = MetricThread.countTapDrillSingle(prum, stoup, prcnt)       # vysledek 3.55
-    print('pro zavit {0} se stroupanim {1} a silou zavitu {2}% pouzij vrtak {3:.2f}'.format(prum, stoup, prcnt, vrtak))
-    print('spravny vysledek je: 3.55 mm')
-
 def putHeader(file):
-    file.write('Soubor k zahrnuti do LaTeX tabulky. Use copy/paste.\n')
+    td = TappingDrills()
+    td.put_header(file)
+
 
 if __name__ == "__main__":
-    # from daptools.LaTeXHelper import generateTableRow
-    # testCountDrill()      # overeni funkcnosti vypoctu
-
-    pool = ThreadPool()
-    metric = pool.list_metric_threads()
-    depthThreads = []
-    for t in metric:
-        depthThreads.append(MetricThread(t))
-
-    depthThreads.sort()         # setrideni zavitu podle prumeru
-    with open(__outputFile__, 'w+') as file:
-        putHeader(file)
-        for d in depthThreads:      # generovani polozek zavitu do tabulky v LaTexu
-            # urceno pro testovani outputu bez nutnosti psat do file
-            if (__DEBUG__):
-                print('{} & {:.2f} & {} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f}\\\\'.format(d.name,
-                    float(d.pitchMM), d.coreMM, float(d.getDrill(60)), float(d.getDrill(65)),
-                    float(d.getDrill(70)), float(d.getDrill(75)), float(d.getDrill(80)), float(d.getDrill(85))))
-
-            # samotne psani do souboru.
-            file.write('{} & {:.2f} & {} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f} & {:.2f}\\\\\n'.format(d.name,
-                float(d.pitchMM), d.coreMM, float(d.getDrill(60)), float(d.getDrill(65)),
-                float(d.getDrill(70)), float(d.getDrill(75)), float(d.getDrill(80)), float(d.getDrill(85))))
-        print('file {} written!'.format(__outputFile__))
-    file.close()
+    td = TappingDrills()
+    td.generate_output()

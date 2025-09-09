@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  strojarina:
+    build: .
+    container_name: strojarina-tools
+    volumes:
+      - .:/app
+      - /app/.venv
+    environment:
+      - PYTHONPATH=/app/src:/app
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  strojarina-tests:
+    build: .
+    container_name: strojarina-tests
+    volumes:
+      - .:/app
+      - /app/.venv
+    environment:
+      - PYTHONPATH=/app/src:/app
+    command: poetry run pytest tests/testDeleni.py tests/testDifferentialThread.py tests/testDivisionPlatePlain.py tests/testFindThread.py tests/testKnurling.py tests/testPlochyNaHrideli.py tests/testPulleys.py tests/testStrojarinaRuzna.py tests/testTappingDrills.py -v

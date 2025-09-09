@@ -21,15 +21,18 @@ def calculate_disks_radius(div, diam):
 
 
 if __name__ == "__main__":
-    import daptools.myTools as tools
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
+    from daptools.myTools import num_usr_in
     divisions = 14
     diameter = 112
     print('Program spocita prumer kotoucku ktere je potreba naskladat kolem disku daneho prumeru \naby se '
           'dosahlo potrebneho deleni bez pouziti delici hlavy nebo neceho podobneho. \nStredy kotoucku '
           'reprezentuji pozice bodu.')
 
-    divisions = tools.numUsrIn('pocet deleni: ', divisions)
-    diameter = tools.numUsrIn('prumer disku k deleni: ', diameter)
+    divisions = num_usr_in('pocet deleni: ', divisions)
+    diameter = num_usr_in('prumer disku k deleni: ', diameter)
 
     smallDisk = calculate_disks_radius(divisions, diameter)
     print('prumer {} malych disku = {:.4f} mm'.format(divisions, smallDisk * 2))

@@ -6,7 +6,8 @@ Created on Oct 29, 2016
 @author: David Potucek
 """
 
-__FILE__ = "FINDTHRD.DAT"
+import os
+__FILE__ = os.path.join(os.path.dirname(__file__), '../data/FINDTHRD.DAT')
 
 class Thread():
     """Represents thread with parameters. Works with all threads. For metric threads only see
@@ -233,6 +234,9 @@ class ThreadPool:
 
     def list_metric_threads(self):
         """Vrati metricke zavity v tuple."""
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
         from daptools.myTools import contains as contain
         metric = []
         for t in self.threadBin:
@@ -241,15 +245,18 @@ class ThreadPool:
         return tuple(metric)
 
 def ui_inint():
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
     import daptools.myTools as myTools
     unit = 'N/A'
     kriterium = 'N/A'
 
-    unit = myTools.strEnumUsrIn("would you like to search for in or mm values? Enter in or mm.",
+    unit = myTools.str_enum_usr_in("would you like to search for in or mm values? Enter in or mm.",
                                 ('mm', 'in'), 'mm')
-    kriterium = myTools.strEnumUsrIn("would you like to search for diameter of pitch? Enter d or p:",
+    kriterium = myTools.str_enum_usr_in("would you like to search for diameter of pitch? Enter d or p:",
                                      ('d', 'p'), 'd')
-    cislo = myTools.numUsrIn("please type value of the thread to search for", 10)
+    cislo = myTools.num_usr_in("please type value of the thread to search for", 10)
     return cislo, unit, kriterium
 
 
@@ -284,7 +291,10 @@ if __name__ == "__main__":
             print(v.name)
     else:
         print("None found!")
-    from daptools.myTools import strEnumUsrIn as userInput
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
+    from daptools.myTools import str_enum_usr_in as userInput
     vypis = userInput('would you like to display list of thread descriptions? \nIf so, input y, otherwise anything else:\n',
                       ('y', '?'), 'n')
     if vypis == 'y':
