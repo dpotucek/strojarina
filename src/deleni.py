@@ -64,9 +64,6 @@ def vypocti_pocet_der(deleni, ratio=40.0):
 
 
 if __name__ == '__main__':
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
     from daptools.myTools import num_usr_in, str_enum_usr_in
     
     hlava = DeliciHlava()

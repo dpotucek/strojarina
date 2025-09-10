@@ -5,6 +5,10 @@ WORKDIR /app
 # Install Poetry
 RUN pip install poetry
 
+# Install DaPTools from wheel
+COPY wheels/*.whl /tmp/
+RUN pip install /tmp/*.whl
+
 # Copy poetry files
 COPY pyproject.toml poetry.lock ./
 
@@ -12,7 +16,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false
 
 # Install dependencies
-RUN poetry install --no-dev
+RUN poetry install --only=main
 
 # Copy source code
 COPY . .
