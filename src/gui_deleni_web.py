@@ -37,16 +37,18 @@ def vypocitat_deleni():
     ratio = int(data.get('ratio', 40))
     ratio_table = int(data.get('ratio_table', 120))
     deleni = int(data.get('deleni'))
+    use_table = data.get('use_table', False)
     
     hlava = DeliciHlava(ratio, ratio_table)
-    pocet_der = hlava.vypocti_pocet_der(deleni)
+    pocet_der = hlava.vypocti_pocet_der(deleni, use_table)
     
     result = {
         'deleni': deleni,
         'ratio': ratio,
         'ratio_table': ratio_table,
         'pocet_der': pocet_der,
-        'success': pocet_der > 0
+        'success': pocet_der > 0,
+        'use_table': use_table
     }
     
     if pocet_der > 0:

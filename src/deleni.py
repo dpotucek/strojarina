@@ -33,11 +33,14 @@ class DeliciHlava:
                 break
         return tuple(out)
 
-    def vypocti_pocet_der(self, deleni):
+    def vypocti_pocet_der(self, deleni, use_table=False):
         """Vypocte z pozadovaneho deleni pri danem pomeru hlavy pocet der.
         :param deleni pozadovane deleni
+        :param use_table pokud True, pouzije ratio_table misto ratio
         :return pocet der"""
-        base = self.ratio / deleni
+        # Vybere spravny pomer podle parametru
+        active_ratio = self.ratio_table if use_table else self.ratio
+        base = active_ratio / deleni
         prubezne = 1
         while True:
             check_num = base * prubezne

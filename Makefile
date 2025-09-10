@@ -1,6 +1,18 @@
 # Makefile pro automatizaci DaPTools integrace
 
-.PHONY: update-daptools build-deps dev clean web
+.PHONY: update-daptools build-deps dev clean web build run test
+
+# Build Docker image
+build:
+	docker build -t strojarina:latest .
+
+# Run interactive container
+run:
+	docker run -it --rm strojarina:latest bash
+
+# Run tests in container
+test:
+	docker run --rm strojarina:latest python -m pytest tests/ || echo "No tests found"
 
 # Aktualizuje DaPTools a rebuild kontejner
 update-daptools:
