@@ -31,7 +31,6 @@ make clean           # Clean Docker images
 make update-daptools # Update DaPTools and rebuild
 make build-deps      # Only build DaPTools wheel
 make web             # Start web GUI on port 5000
-make gui             # Start X11 GUI (requires X server)
 ```
 
 ### Automated Dependency Updates
@@ -62,15 +61,14 @@ strojarina/
 ├── src/                    # Application source code
 │   ├── deleni.py          # Division head calculations
 │   ├── gui_deleni_web.py  # Web GUI Flask server
-│   ├── gui_deleni.py      # Tkinter GUI (alternative)
-│   ├── gui_launcher.py    # GUI launcher menu
+
 │   └── templates/         # HTML templates for web GUI
 │       └── deleni.html    # Main web interface
 ├── wheels/                # DaPTools wheel distributions
 ├── Dockerfile             # Container definition
 ├── Makefile              # Automation commands
 ├── update-deps.sh        # Dependency update script
-└── run-gui.sh           # GUI startup script
+
 ```
 
 ## GUI Interface

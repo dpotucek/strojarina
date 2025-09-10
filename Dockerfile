@@ -2,6 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Poetry
 RUN pip install poetry
 
@@ -24,5 +28,8 @@ COPY . .
 # Set Python path
 ENV PYTHONPATH=/app/src:/app
 
+# Expose port for web GUI
+EXPOSE 5000
+
 # Default command
-CMD ["python", "-c", "print('Strojarina tools ready. Available modules in src/: deleni, differentialThread, knurling, pulleys, etc.')"]
+CMD ["python", "src/gui_deleni_web.py"]
