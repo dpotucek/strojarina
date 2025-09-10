@@ -61,14 +61,12 @@ strojarina/
 ├── src/                    # Application source code
 │   ├── deleni.py          # Division head calculations
 │   ├── gui_deleni_web.py  # Web GUI Flask server
-
 │   └── templates/         # HTML templates for web GUI
 │       └── deleni.html    # Main web interface
 ├── wheels/                # DaPTools wheel distributions
 ├── Dockerfile             # Container definition
 ├── Makefile              # Automation commands
-├── update-deps.sh        # Dependency update script
-
+└── update-deps.sh        # Dependency update script
 ```
 
 ## GUI Interface
@@ -85,9 +83,12 @@ docker run --rm -d -p 5000:5000 strojarina:latest
 
 ### Features
 - **Dělicí hlava calculator** with interactive web interface
-- **Dropdown selection** for hole counts from predefined values
+- **Ratio selection:** Combo box for "Dělicí hlava (40)" or "Stůl (120)"
+- **Dropdown selection** for hole counts from predefined values (24-66)
 - **Integer-only inputs** for precise calculations
-- **Two ratio parameters:** dividing head ratio and table ratio
+- **Two main functions:**
+  - **Dosažitelná dělení** - shows possible divisions for selected hole count
+  - **Výpočet děr pro dělení** - calculates required holes for desired division
 - **Real-time calculations** via AJAX
 - **Responsive design** works on all devices
 
