@@ -1,30 +1,26 @@
-# Strojarina Docker Makefile
+# Makefile pro automatizaci DaPTools integrace
 
-.PHONY: build run test clean
+.PHONY: update-daptools build-deps dev clean
 
-# Build Docker image
-build:
-	docker build -t strojarina:latest .
+# Aktualizuje DaPTools a rebuild kontejner
+update-daptools:
+	@echo "Building DaPTools..."
+	cd ../DaPTools && poetry build
+	@echo "Copying wheel to strojarina..."
+	cp ../DaPTools/dist/*.whl wheels/
+	@echo "Rebuilding container..."
+	docker build -t strojarina:latest . --no-cache
 
-# Run interactive container
-run:
-	docker run -it --rm \
-		-v "$(PWD)":/app \
-		-e PYTHONPATH=/app/src:/app \
-		--name strojarina-dev \
-		strojarina:latest /bin/bash
+# Pouze build DaPTools wheel
+build-deps:
+	cd ../DaPTools && poetry build
+	cp ../DaPTools/dist/*.whl wheels/
 
-# Run tests in container
-test:
-	docker run --rm \
-		-v "$(PWD)":/app \
-		-e PYTHONPATH=/app/src:/app \
-		strojarina:latest \
-		poetry run pytest tests/testDeleni.py tests/testDifferentialThread.py tests/testDivisionPlatePlain.py tests/testFindThread.py tests/testKnurling.py tests/testPlochyNaHrideli.py tests/testPulleys.py tests/testStrojarinaRuzna.py tests/testTappingDrills.py -v
+# Development s hot reload
+dev: update-daptools
+	docker run -it --rm -v $(PWD):/app strojarina:latest bash
 
-# Clean Docker images
+# Vyčistí staré wheels
 clean:
-	docker rmi strojarina:latest || true
-
-# Build and run
-dev: build run
+	rm -f wheels/*.whl
+	docker image prune -f
