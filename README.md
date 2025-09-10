@@ -30,6 +30,8 @@ make test            # Run tests in container
 make clean           # Clean Docker images
 make update-daptools # Update DaPTools and rebuild
 make build-deps      # Only build DaPTools wheel
+make web             # Start web GUI on port 5000
+make gui             # Start X11 GUI (requires X server)
 ```
 
 ### Automated Dependency Updates
@@ -57,15 +59,42 @@ docker-compose run --rm strojarina-tests  # Run tests
 ### Project Structure
 ```
 strojarina/
-├── src/           # Application source code
-├── wheels/        # DaPTools wheel distributions
-├── Dockerfile     # Container definition
-├── Makefile       # Automation commands
-└── update-deps.sh # Dependency update script
+├── src/                    # Application source code
+│   ├── deleni.py          # Division head calculations
+│   ├── gui_deleni_web.py  # Web GUI Flask server
+│   ├── gui_deleni.py      # Tkinter GUI (alternative)
+│   ├── gui_launcher.py    # GUI launcher menu
+│   └── templates/         # HTML templates for web GUI
+│       └── deleni.html    # Main web interface
+├── wheels/                # DaPTools wheel distributions
+├── Dockerfile             # Container definition
+├── Makefile              # Automation commands
+├── update-deps.sh        # Dependency update script
+└── run-gui.sh           # GUI startup script
 ```
 
+## GUI Interface
+
+### Web GUI (Recommended)
+```bash
+# Start web interface
+make web
+# → Open http://localhost:5000 in browser
+
+# Or manually
+docker run --rm -d -p 5000:5000 strojarina:latest
+```
+
+### Features
+- **Dělicí hlava calculator** with interactive web interface
+- **Dropdown selection** for hole counts from predefined values
+- **Integer-only inputs** for precise calculations
+- **Two ratio parameters:** dividing head ratio and table ratio
+- **Real-time calculations** via AJAX
+- **Responsive design** works on all devices
+
 ## Tools Available
-- `deleni` - Division calculations
+- `deleni` - Division calculations (with GUI)
 - `differential-thread` - Thread calculations
 - `division-plate` - Division plate calculations
 - `find-thread` - Thread finder
