@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strojarina - Machining Tools</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .lang-switcher { text-align: right; margin-bottom: 20px; }
+        .lang-switcher a { margin: 0 5px; color: #007bff; text-decoration: none; }
+        .lang-switcher a.active { font-weight: bold; color: #333; }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 40px; }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .tool-card { background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .tool-card:hover { border-color: #007bff; background: #e7f3ff; }
+        .tool-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .tool-desc { color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switcher">
+            <a href="/">CZ</a> | <a href="/en" class="active">EN</a>
+        </div>
+        <h1>Strojarina</h1>
+        <p class="subtitle">Machining Tools</p>
+        
+        <div class="tool-grid">
+            <div class="tool-card" onclick="window.location.href='/en/dividing-head'">
+                <div class="tool-title">Dividing Head</div>
+                <div class="tool-desc">Calculations for dividing head and rotary table - available divisions and hole counts</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/differential-thread'">
+                <div class="tool-title">Differential Threading</div>
+                <div class="tool-desc">Calculate thread combinations for required pitch</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/division-plate'">
+                <div class="tool-title">Division Plate</div>
+                <div class="tool-desc">Calculate disk diameter for division without dividing head</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/find-thread'">
+                <div class="tool-title">Thread Finder</div>
+                <div class="tool-desc">Search threads by diameter or pitch</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/knurling'">
+                <div class="tool-title">Knurling</div>
+                <div class="tool-desc">Calculate knurling parameters for given diameter</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/shaft-surfaces'">
+                <div class="tool-title">Shaft Surface Calculations</div>
+                <div class="tool-desc">Cut depth for flats and squares on shafts</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/material-bending'">
+                <div class="tool-title">Material Bending</div>
+                <div class="tool-desc">Calculate material length required for bending</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/pulleys'">
+                <div class="tool-title">Pulleys</div>
+                <div class="tool-desc">Calculate pulley parameters - RPM, diameters and belt length</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/sine-bar'">
+                <div class="tool-title">Sine Bar</div>
+                <div class="tool-desc">Calculate cylinder diameters for sine bar</div>
+            </div>
+            
+            <div class="tool-card" onclick="window.location.href='/en/tapping-drills'">
+                <div class="tool-title">Tapping Drills</div>
+                <div class="tool-desc">Calculate drill diameter for thread pre-drilling</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

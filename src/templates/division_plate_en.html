@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Division Plate - Calculations</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .lang-switcher { text-align: right; margin-bottom: 20px; }
+        .lang-switcher a { margin: 0 5px; color: #007bff; text-decoration: none; }
+        .lang-switcher a.active { font-weight: bold; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 150px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .results { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 100px; }
+        .back-link { margin-bottom: 20px; }
+        .back-link a { color: #007bff; text-decoration: none; }
+        .back-link a:hover { text-decoration: underline; }
+        .description { margin-bottom: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; color: #495057; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switcher">
+            <a href="/division-plate">CZ</a> | <a href="/en/division-plate" class="active">EN</a>
+        </div>
+        <h1>Division Plate</h1>
+        
+        <div class="back-link">
+            <a href="/en">&larr; Back to main menu</a>
+        </div>
+        
+        <div class="description">
+            <p>Calculate the diameter of small disks needed to be arranged around a main disk to achieve precise divisions without using a dividing head. The centers of the small disks represent the position points.</p>
+        </div>
+        
+        <div class="form-group">
+            <label>Number of divisions:</label>
+            <input type="number" id="divisions" value="14" step="1" min="3">
+        </div>
+        
+        <div class="form-group">
+            <label>Main disk diameter (mm):</label>
+            <input type="number" id="diameter" value="112" step="0.1" min="1">
+        </div>
+        
+        <button onclick="calculateDivisionPlate()">Calculate</button>
+        
+        <div id="results" class="results">
+            <p>Enter parameters and click Calculate</p>
+        </div>
+    </div>
+
+    <script>
+        async function calculateDivisionPlate() {
+            const divisions = document.getElementById('divisions').value;
+            const diameter = document.getElementById('diameter').value;
+            
+            if (!divisions || !diameter) {
+                alert('Enter all parameters');
+                return;
+            }
+            
+            if (parseInt(divisions) < 3) {
+                alert('Number of divisions must be at least 3');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/division-plate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        divisions: parseInt(divisions),
+                        diameter: parseFloat(diameter)
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                let html;
+                
+                if (data.success) {
+                    html = `<h3>Calculation Results:</h3>`;
+                    html += `<p><strong>Number of divisions:</strong> ${data.divisions}</p>`;
+                    html += `<p><strong>Main disk diameter:</strong> ${data.diameter} mm</p>`;
+                    html += `<p><strong>Small disk radius:</strong> ${data.small_disk_radius} mm</p>`;
+                    html += `<p><strong>Small disk diameter:</strong> ${data.small_disk_diameter} mm</p>`;
+                } else {
+                    html = `<p style="color: red;">Error: ${data.error}</p>`;
+                }
+                
+                document.getElementById('results').innerHTML = html;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = `<p style="color: red;">Calculation error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Výpočet ploch na hřídeli</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #ddd; cursor: pointer; border: none; margin-right: 5px; }
+        .tab.active { background: #007bff; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 150px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .results { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 100px; }
+        .back-link { margin-bottom: 20px; }
+        .back-link a { color: #007bff; text-decoration: none; }
+        .back-link a:hover { text-decoration: underline; }
+        .description { margin-bottom: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; color: #495057; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Výpočty ploch na hřídeli</h1>
+        
+        <div class="back-link">
+            <a href="/">&larr; Zpět na hlavní menu</a>
+        </div>
+        
+        <div class="description">
+            <p>Výpočet hloubky řezu pro plochy a čtverce na hřídeli podle průměru a požadovaných rozměrů.</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('flat')">Ploška</button>
+            <button class="tab" onclick="showTab('square')">Čtverec max</button>
+            <button class="tab" onclick="showTab('square_custom')">Čtverec hrana</button>
+        </div>
+        
+        <div id="flat" class="tab-content active">
+            <h3>Výpočet plošky na hřídeli pro danou šířku plošky</h3>
+            <div class="form-group">
+                <label>Průměr hřídele (mm):</label>
+                <input type="number" id="flat-diameter" value="25" step="0.1" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label>Šířka plošky (mm):</label>
+                <input type="number" id="flat-width" value="7" step="0.1" min="0.1">
+            </div>
+            
+            <button onclick="calculateFlat()">Vypočítat</button>
+        </div>
+        
+        <div id="square" class="tab-content">
+            <h3>Výpočet maximálního čtverce na hřídeli</h3>
+            <div class="form-group">
+                <label>Průměr hřídele (mm):</label>
+                <input type="number" id="square-diameter" value="25" step="0.1" min="1">
+            </div>
+            
+            <button onclick="calculateSquare()">Vypočítat</button>
+        </div>
+        
+        <div id="square_custom" class="tab-content">
+            <h3>Výpočet čtverce s vlastním rozměrem</h3>
+            <div class="form-group">
+                <label>Průměr hřídele (mm):</label>
+                <input type="number" id="custom-diameter" value="25" step="0.1" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label>Délka hrany čtverce (mm):</label>
+                <input type="number" id="custom-edge" value="15" step="0.1" min="0.1">
+            </div>
+            
+            <button onclick="calculateCustomSquare()">Vypočítat</button>
+        </div>
+        
+        <div id="results" class="results">
+            <p>Vyberte typ výpočtu a zadejte parametry</p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // Clear results when switching tabs
+            document.getElementById('results').innerHTML = '<p>Zadejte parametry a klikněte na Vypočítat</p>';
+        }
+        
+        async function calculateFlat() {
+            const diameter = document.getElementById('flat-diameter').value;
+            const width = document.getElementById('flat-width').value;
+            
+            if (!diameter || !width) {
+                alert('Zadejte všechny parametry');
+                return;
+            }
+            
+            if (parseFloat(diameter) <= 0 || parseFloat(width) <= 0) {
+                alert('Všechny hodnoty musí být větší než 0');
+                return;
+            }
+            
+            if (parseFloat(width) >= parseFloat(diameter)) {
+                alert('Šířka plošky musí být menší než průměr hřídele');
+                return;
+            }
+            
+            await calculateSurface('flat', {
+                diameter: parseFloat(diameter),
+                width: parseFloat(width)
+            });
+        }
+        
+        async function calculateSquare() {
+            const diameter = document.getElementById('square-diameter').value;
+            
+            if (!diameter) {
+                alert('Zadejte průměr hřídele');
+                return;
+            }
+            
+            if (parseFloat(diameter) <= 0) {
+                alert('Průměr musí být větší než 0');
+                return;
+            }
+            
+            await calculateSurface('square', {
+                diameter: parseFloat(diameter)
+            });
+        }
+        
+        async function calculateCustomSquare() {
+            const diameter = document.getElementById('custom-diameter').value;
+            const edgeLength = document.getElementById('custom-edge').value;
+            
+            if (!diameter || !edgeLength) {
+                alert('Zadejte všechny parametry');
+                return;
+            }
+            
+            if (parseFloat(diameter) <= 0 || parseFloat(edgeLength) <= 0) {
+                alert('Všechny hodnoty musí být větší než 0');
+                return;
+            }
+            
+            if (parseFloat(edgeLength) >= parseFloat(diameter)) {
+                alert('Délka hrany čtverce musí být menší než průměr hřídele');
+                return;
+            }
+            
+            await calculateSurface('square_custom', {
+                diameter: parseFloat(diameter),
+                edge_length: parseFloat(edgeLength)
+            });
+        }
+        
+        async function calculateSurface(type, params) {
+            try {
+                const response = await fetch('/api/shaft-surfaces', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: type,
+                        ...params
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let html;
+                
+                if (data.success) {
+                    html = `<h3>Výsledky výpočtu:</h3>`;
+                    html += `<p><strong>Průměr hřídele:</strong> ${data.diameter} mm</p>`;
+                    
+                    if (data.type === 'flat') {
+                        html += `<p><strong>Šířka plošky:</strong> ${data.width} mm</p>`;
+                        html += `<p><strong>Hloubka řezu plošky:</strong> ${data.depth} mm</p>`;
+                    } else if (data.type === 'square') {
+                        html += `<p><strong>Hloubka řezu čtverce:</strong> ${data.depth} mm</p>`;
+                        html += `<p><strong>Délka hrany čtverce:</strong> ${data.edge_length} mm</p>`;
+                    } else if (data.type === 'square_custom') {
+                        html += `<p><strong>Délka hrany čtverce:</strong> ${data.edge_length} mm</p>`;
+                        html += `<p><strong>Hloubka řezu čtverce:</strong> ${data.depth} mm</p>`;
+                    }
+                } else {
+                    html = `<p style="color: red;">Chyba: ${data.error}</p>`;
+                }
+                
+                document.getElementById('results').innerHTML = html;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = `<p style="color: red;">Chyba při výpočtu: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

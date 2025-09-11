@@ -31,9 +31,26 @@ class PlochyNaHrideli:
     def hloubka_ctverce(self, prumer):
         """Vypocte hloubku ctverce na hrideli.
         :param prumer: prumer hridele v mm
+        :return: tuple (hloubka rezu v mm, delka hrany ctverce v mm)
+        """
+        hloubka = 0.125 * prumer
+        delka_hrany = prumer * 0.707  # prumer / sqrt(2)
+        return hloubka, delka_hrany
+    
+    def hloubka_ctverce_custom(self, prumer, delka_hrany):
+        """Vypocte hloubku ctverce na hrideli pro zadanou delku hrany.
+        :param prumer: prumer hridele v mm
+        :param delka_hrany: pozadovana delka hrany ctverce v mm
         :return: hloubka rezu v mm
         """
-        return 0.125 * prumer
+        if delka_hrany > prumer:
+            raise ValueError("Délka hrany čtverce nemůže být větší než průměr hřídele")
+        
+        # Hloubka = prumer - vzdalenost od stredu k hrane ctverce
+        # Vzdalenost od stredu k hrane = delka_hrany / sqrt(2)
+        vzdalenost_k_hrane = delka_hrany / sqrt(2)
+        hloubka = prumer/2 - vzdalenost_k_hrane
+        return hloubka
 
 
 # Zachovani zpetne kompatibility
@@ -43,7 +60,12 @@ def hloubka_plosky(prumer, sirka_plosky):
 
 def hloubka_ctverce(prumer):
     pnh = PlochyNaHrideli()
-    return pnh.hloubka_ctverce(prumer)
+    hloubka, delka_hrany = pnh.hloubka_ctverce(prumer)
+    return hloubka  # zachovani zpetne kompatibility - vraci jen hloubku
+
+def hloubka_ctverce_custom(prumer, delka_hrany):
+    pnh = PlochyNaHrideli()
+    return pnh.hloubka_ctverce_custom(prumer, delka_hrany)
 
 
 if __name__ == "__main__":
@@ -55,8 +77,8 @@ if __name__ == "__main__":
     if choice == 'c':           # pocitame ctverec
         print('počítáme čtverec na hřídeli.')
         prumer = num_usr_in('Zadej průměr hřídele: ', defaultPrumer)
-        hloubkaRezu = pnh.hloubka_ctverce(prumer)
-        print('Pro průměr hřídele {}mm je hloubka řezu čtverce {:3.2f}mm'.format(prumer, hloubkaRezu))
+        hloubkaRezu, delkaHrany = pnh.hloubka_ctverce(prumer)
+        print('Pro průměr hřídele {}mm je hloubka řezu čtverce {:3.2f}mm a délka hrany {:3.2f}mm'.format(prumer, hloubkaRezu, delkaHrany))
     else:
         print('počítáme plošku na hřídeli.')
         prumer = num_usr_in('Zadej průměr hřídele: ', defaultPrumer)

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dělicí hlava - výpočty</title>
+    <title>Dividing Head - Calculations</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .lang-switcher { text-align: right; margin-bottom: 20px; }
+        .lang-switcher a { margin: 0 5px; color: #007bff; text-decoration: none; }
+        .lang-switcher a.active { font-weight: bold; color: #333; }
         .tabs { display: flex; margin-bottom: 20px; }
         .tab { padding: 10px 20px; background: #ddd; cursor: pointer; border: none; margin-right: 5px; }
         .tab.active { background: #007bff; color: white; }
@@ -30,55 +33,56 @@
 </head>
 <body>
     <div class="container">
-        <h1>Dělicí hlava - výpočty</h1>
+        <div class="lang-switcher">
+            <a href="/deleni">CZ</a> | <a href="/en/dividing-head" class="active">EN</a>
+        </div>
+        <h1>Dividing Head - Calculations</h1>
         
         <div class="form-group">
-            <label>Poměr:</label>
+            <label>Ratio:</label>
             <select id="ratio_select">
-                <option value="40">Dělicí hlava (40)</option>
-                <option value="120">Stůl (120)</option>
+                <option value="40">Dividing Head (40)</option>
+                <option value="120">Table (120)</option>
             </select>
         </div>
         
         <div class="back-link">
-            <a href="/">&larr; Zpět na hlavní menu</a>
+            <a href="/en">&larr; Back to main menu</a>
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="showTab('pocty')">Dosažitelná dělení</button>
-            <button class="tab" onclick="showTab('deleni')">Výpočet děr pro dělení</button>
+            <button class="tab active" onclick="showTab('pocty')">Available Divisions</button>
+            <button class="tab" onclick="showTab('deleni')">Calculate Holes for Division</button>
         </div>
         
         <div class="tab-descriptions">
-            <p id="desc-pocty" class="tab-desc active">zobrazuje možná dělení pro vybraný počet děr</p>
-            <p id="desc-deleni" class="tab-desc">vypočítá potřebný počet děr pro požadované dělení</p>
+            <p id="desc-pocty" class="tab-desc active">shows possible divisions for selected hole count</p>
+            <p id="desc-deleni" class="tab-desc">calculates required holes for desired division</p>
         </div>
         
         <div id="pocty" class="tab-content active">
             <div class="form-group">
-                <label>Počet děr v kotouči:</label>
+                <label>Number of holes in plate:</label>
                 <select id="pocet_der">
-                    <option value="">Vyberte počet děr...</option>
+                    <option value="">Select hole count...</option>
                 </select>
-                <button onclick="vypocitatPocty()">Vypočítat</button>
+                <button onclick="vypocitatPocty()">Calculate</button>
             </div>
             <div id="pocty-results" class="results">
-                <p>Zadejte počet děr a klikněte na Vypočítat</p>
+                <p>Enter hole count and click Calculate</p>
             </div>
         </div>
         
         <div id="deleni" class="tab-content">
             <div class="form-group">
-                <label>Požadované dělení:</label>
+                <label>Required division:</label>
                 <input type="number" id="pozadovane_deleni" value="" step="1" min="1">
-                <button onclick="vypocitatDeleni()">Vypočítat</button>
+                <button onclick="vypocitatDeleni()">Calculate</button>
             </div>
             <div id="deleni-results" class="results">
-                <p>Zadejte požadované dělení a klikněte na Vypočítat</p>
+                <p>Enter required division and click Calculate</p>
             </div>
         </div>
-        
-
     </div>
 
     <script>
@@ -92,7 +96,6 @@
             document.getElementById('desc-' + tabName).classList.add('active');
         }
         
-        // Načtení možností při načtení stránky
         window.onload = function() {
             loadOptions();
         };
@@ -103,9 +106,8 @@
                 const data = await response.json();
                 
                 const select = document.getElementById('pocet_der');
-                select.innerHTML = '<option value="">Vyberte počet děr...</option>';
+                select.innerHTML = '<option value="">Select hole count...</option>';
                 
-                // Kombinace diry a diry2
                 const allDiry = [...data.diry, ...data.diry2].sort((a, b) => a - b);
                 
                 allDiry.forEach(pocet => {
@@ -115,7 +117,7 @@
                     select.appendChild(option);
                 });
             } catch (error) {
-                console.error('Chyba při načítání možností:', error);
+                console.error('Error loading options:', error);
             }
         }
         
@@ -124,18 +126,15 @@
             const pocet_der = document.getElementById('pocet_der').value;
             
             if (!pocet_der) {
-                alert('Vyberte počet děr');
+                alert('Select hole count');
                 return;
             }
             
-            // Nastaví ratio a ratio_table podle výběru
             let ratio, ratio_table;
             if (selectedRatio === '120') {
-                // Stůl - použije ratio_table=120
                 ratio = 40;
                 ratio_table = 120;
             } else {
-                // Dělicí hlava - použije ratio=40
                 ratio = parseInt(selectedRatio);
                 ratio_table = 120;
             }
@@ -149,7 +148,7 @@
                 
                 const data = await response.json();
                 
-                let html = `<h3>Pro ${data.pocet_der} děr (max: ${data.max_deleni}):</h3>`;
+                let html = `<h3>For ${data.pocet_der} holes (max: ${data.max_deleni}):</h3>`;
                 html += '<div class="deleni-grid">';
                 
                 data.deleni.forEach(d => {
@@ -157,11 +156,11 @@
                 });
                 
                 html += '</div>';
-                html += `<p><strong>Celkem možností: ${data.celkem}</strong></p>`;
+                html += `<p><strong>Total possibilities: ${data.celkem}</strong></p>`;
                 
                 document.getElementById('pocty-results').innerHTML = html;
             } catch (error) {
-                document.getElementById('pocty-results').innerHTML = '<p style="color: red;">Chyba při výpočtu</p>';
+                document.getElementById('pocty-results').innerHTML = '<p style="color: red;">Calculation error</p>';
             }
         }
         
@@ -170,19 +169,16 @@
             const deleni = document.getElementById('pozadovane_deleni').value;
             
             if (!deleni) {
-                alert('Zadejte požadované dělení');
+                alert('Enter required division');
                 return;
             }
             
-            // Nastaví ratio a ratio_table podle výběru
             let ratio, ratio_table, use_table;
             if (selectedRatio === '120') {
-                // Stůl - použije ratio_table=120
                 ratio = 40;
                 ratio_table = 120;
                 use_table = true;
             } else {
-                // Dělicí hlava - použije ratio=40
                 ratio = parseInt(selectedRatio);
                 ratio_table = 120;
                 use_table = false;
@@ -197,27 +193,24 @@
                 
                 const data = await response.json();
                 
-                // Určí, který poměr byl použit na základě originálního výběru
                 const selectedRatio = document.getElementById('ratio_select').value;
-                const ratioText = selectedRatio === '120' ? 'stůl (120)' : `hlava (${selectedRatio})`;
-                let html = `<h3>Pro dělení ${data.deleni} při poměru ${ratioText}:</h3>`;
+                const ratioText = selectedRatio === '120' ? 'table (120)' : `head (${selectedRatio})`;
+                let html = `<h3>For division ${data.deleni} with ratio ${ratioText}:</h3>`;
                 
                 if (data.success) {
-                    html += `<p><strong>Potřebný počet děr: ${data.pocet_der}</strong></p>`;
-                    html += '<p>Nebo celočíselné násobky tohoto čísla.</p>';
-                    html += '<p><strong>Možné počty děr:</strong> ';
+                    html += `<p><strong>Required holes: ${data.pocet_der}</strong></p>`;
+                    html += '<p>Or integer multiples of this number.</p>';
+                    html += '<p><strong>Possible hole counts:</strong> ';
                     html += data.nasobky.join(', ') + ', ...</p>';
                 } else {
-                    html += '<p style="color: red;">CHYBA: Nelze vypočítat (příliš mnoho děr)</p>';
+                    html += '<p style="color: red;">ERROR: Cannot calculate (too many holes)</p>';
                 }
                 
                 document.getElementById('deleni-results').innerHTML = html;
             } catch (error) {
-                document.getElementById('deleni-results').innerHTML = '<p style="color: red;">Chyba při výpočtu</p>';
+                document.getElementById('deleni-results').innerHTML = '<p style="color: red;">Calculation error</p>';
             }
         }
-        
-
     </script>
 </body>
 </html>
