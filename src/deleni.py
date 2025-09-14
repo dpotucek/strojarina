@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Created on Jun 29, 2015
 Vypocty k delici hlave
@@ -29,8 +28,6 @@ class DeliciHlava:
             num = max_num / iterator
             if num.is_integer():
                 out.append(int(num))
-            if iterator > max_num:
-                break
         return tuple(out)
 
     def vypocti_pocet_der(self, deleni, use_table=False):
@@ -49,7 +46,7 @@ class DeliciHlava:
             else:
                 prubezne += 1
             if prubezne > 150:
-                print("too much holes, aborting")
+                print(f"Too many holes required (>{150}) for division {deleni}, aborting")
                 prubezne = 0
                 break
         return prubezne
@@ -84,4 +81,4 @@ if __name__ == '__main__':
             print('pro deleni {} je nutne mit pri pomeru hlavy {} obsazenych {} der v kotouci, '
                   'nebo celociselne nasobky tohoto cisla.'.format(pozadDeleni, hlava.ratio, pocetDer))
         else:
-            print("ERROR occured...")
+            print(f"Cannot calculate holes for division {pozadDeleni} with ratio {hlava.ratio}")

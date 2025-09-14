@@ -16,6 +16,31 @@ from sineBar import calculate_link_sine_bar, calculate_contact_sine_bar
 from tappingDrills import MetricThread
 import math
 
+# Thread pitch constants for performance
+STOUPANI_MM = [0.4, 0.45, 0.5, 0.6, 0.7, 0.75, 0.8, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
+STOUPANI_TPI = [4, 4.5, 5, 5.5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64, 72, 80]
+
+def safe_float(value, param_name):
+    """Safely convert value to float with validation"""
+    if value is None:
+        raise ValueError(f"Missing required parameter: {param_name}")
+    try:
+        result = float(value)
+        if math.isnan(result) or math.isinf(result):
+            raise ValueError(f"Invalid numeric value for {param_name}")
+        return result
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid numeric value for {param_name}: {value}")
+
+def safe_int(value, param_name):
+    """Safely convert value to int with validation"""
+    if value is None:
+        raise ValueError(f"Missing required parameter: {param_name}")
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid integer value for {param_name}: {value}")
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -163,12 +188,8 @@ def calculate_differential():
     pozadovane_stoupani = float(data.get('pozadovane_stoupani'))
     jednotky = data.get('jednotky', 'mm')
     
-    # Predefinovane hodnoty zavitu
-    stoupani_mm = [0.4, 0.45, 0.5, 0.6, 0.7, 0.75, 0.8, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
-    stoupani_tpi = [4, 4.5, 5, 5.5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64, 72, 80]
-    
     # Kontrola, zda je požadované stoupání přímo dostupné
-    dostupne_hodnoty = stoupani_mm if jednotky == 'mm' else stoupani_tpi
+    dostupne_hodnoty = STOUPANI_MM if jednotky == 'mm' else STOUPANI_TPI
     if pozadovane_stoupani in dostupne_hodnoty:
         return jsonify({
             'success': False,
@@ -178,7 +199,7 @@ def calculate_differential():
     dt = DifferentialThread()
     
     try:
-        kombinace = dt.vyzkousej_kombinace(pozadovane_stoupani, stoupani_tpi, stoupani_mm, jednotky)
+        kombinace = dt.vyzkousej_kombinace(pozadovane_stoupani, STOUPANI_TPI, STOUPANI_MM, jednotky)
         
         if kombinace:
             result = {

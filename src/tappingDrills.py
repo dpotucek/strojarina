@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """
 tappingDrills produkuje soubor zavitu a vrtaku k zahrnuti do LaTeX tabulky.
 Soubor obsahuje udaje o zavitu a vrtaky pro ruzne sily zavitu.
@@ -67,8 +66,7 @@ class MetricThread:
         self.coreMM = thread.coreMM
         self.depthInch = thread.depthInch
         self.depthMM = thread.depthMM
-        for s in self.sily:
-            self.vrtaky.append(self.countTapDrill(thread.diaMM, thread.pitchMM, s))
+        self.vrtaky = [self.countTapDrill(thread.diaMM, thread.pitchMM, s) for s in self.sily]
 
     def getDrill(self, strength):
         if strength <= 20 or strength > 100:
