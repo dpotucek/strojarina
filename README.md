@@ -150,6 +150,10 @@ strojarina/
 - Comprehensive input validation and error handling
 - Area and perimeter calculations
 - Height calculations to any side using formula: height = (2 × area) / base
+- **Incircle & Circumcircle**: Calculate radii of inscribed and circumscribed circles
+- **Medians**: Calculate all three medians using formula: m_a = 0.5 × √(2b² + 2c² - a²)
+- **Centroid**: Calculate centroid coordinates from vertex positions
+- **Precision Control**: 4 levels from 10 angular minutes (3 digits) to 1 second (6 digits)
 
 ### General Triangle Calculator
 - Calculate any triangle from three parameters (sides/angles)
@@ -159,6 +163,10 @@ strojarina/
 - Mollweide equation verification for all triangle types
 - Heron's formula for area calculation
 - Height calculations to all three sides with validation
+- **Incircle & Circumcircle**: r = area/semiperimeter, R = (abc)/(4×area)
+- **Medians**: All three medians with precision rounding
+- **Centroid**: Geometric center calculation from vertices
+- **Advanced Geometry**: Complete geometric analysis for machining applications
 
 ## Docker Usage
 
@@ -211,7 +219,7 @@ python3 tests/testTriangles.py  # Right triangle tests
 python3 -c "from deleni import DeliciHlava; h = DeliciHlava(); print(h.vypocti_pocet_der(40))"
 python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print(t)"
 python3 -c "from triangles import CommonTriangle; t = CommonTriangle(a=3, b=4, c=5); print(t)"
-python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print('Heights:', t.get_all_heights())"
+python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print('Heights:', t.get_all_heights()); print('Circles:', t.get_circles_and_geometry())"
 ```
 
 ### Docker Development

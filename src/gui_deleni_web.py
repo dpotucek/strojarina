@@ -546,6 +546,7 @@ def calculate_right_triangle():
             'precision': precision,
             'triangle': triangle.get_rounded_values(),
             'heights': triangle.get_all_heights(),
+            'circles_geometry': triangle.get_circles_and_geometry(),
             'mollweide_valid': triangle.verify_mollweide()
         }
     except Exception as e:
@@ -575,6 +576,7 @@ def calculate_common_triangle():
             'precision': precision,
             'triangle': triangle.get_rounded_values(),
             'heights': triangle.get_all_heights(),
+            'circles_geometry': triangle.get_circles_and_geometry(),
             'mollweide_valid': triangle.verify_mollweide(),
             'triangle_type': {
                 'right': triangle.is_right_triangle(),

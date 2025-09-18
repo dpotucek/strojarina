@@ -189,6 +189,7 @@
                 if (result.success) {
                     const t = result.triangle;
                     const h = result.heights;
+                    const cg = result.circles_geometry;
                     resultDiv.innerHTML = `
                         <h3>Výsledek:</h3>
                         <p><strong>Strany:</strong> a = ${t.a}, b = ${t.b}, c = ${t.c}</p>
@@ -196,6 +197,10 @@
                         <p><strong>Obsah:</strong> ${t.area}</p>
                         <p><strong>Obvod:</strong> ${t.perimeter}</p>
                         <p><strong>Výšky:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Vepsaná kružnice:</strong> r = ${cg.inradius}</p>
+                        <p><strong>Opsaná kružnice:</strong> R = ${cg.circumradius}</p>
+                        <p><strong>Těžnice:</strong> m_a = ${cg.medians.m_a}, m_b = ${cg.medians.m_b}, m_c = ${cg.medians.m_c}</p>
+                        <p><strong>Těžiště:</strong> (${cg.centroid[0]}, ${cg.centroid[1]})</p>
                         <p><strong>Mollweide ověření:</strong> ${result.mollweide_valid ? 'Platné' : 'Neplatné'}</p>
                         <p><strong>Přesnost:</strong> ${result.precision}</p>
                     `;
@@ -243,6 +248,7 @@
                 if (result.success) {
                     const t = result.triangle;
                     const h = result.heights;
+                    const cg = result.circles_geometry;
                     const type = result.triangle_type;
                     let typeStr = [];
                     if (type.right) typeStr.push('pravoúhlý');
@@ -256,6 +262,10 @@
                         <p><strong>Obsah:</strong> ${t.area}</p>
                         <p><strong>Obvod:</strong> ${t.perimeter}</p>
                         <p><strong>Výšky:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Vepsaná kružnice:</strong> r = ${cg.inradius}</p>
+                        <p><strong>Opsaná kružnice:</strong> R = ${cg.circumradius}</p>
+                        <p><strong>Těžnice:</strong> m_a = ${cg.medians.m_a}, m_b = ${cg.medians.m_b}, m_c = ${cg.medians.m_c}</p>
+                        <p><strong>Těžiště:</strong> (${cg.centroid[0]}, ${cg.centroid[1]})</p>
                         <p><strong>Typ trojúhelníku:</strong> ${typeStr.length > 0 ? typeStr.join(', ') : 'obecný'}</p>
                         <p><strong>Mollweide ověření:</strong> ${result.mollweide_valid ? 'Platné' : 'Neplatné'}</p>
                         <p><strong>Přesnost:</strong> ${result.precision}</p>

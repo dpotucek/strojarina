@@ -284,6 +284,64 @@ class RightTriangle:
             'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
         }
     
+    def get_inradius(self):
+        """Calculate inradius (radius of inscribed circle)."""
+        area = self.get_area()
+        semiperimeter = self.get_perimeter() / 2
+        return PrecisionSettings.round_value(area / semiperimeter, self.precision)
+    
+    def get_circumradius(self):
+        """Calculate circumradius (radius of circumscribed circle)."""
+        area = self.get_area()
+        return PrecisionSettings.round_value((self.a * self.b * self.c) / (4 * area), self.precision)
+    
+    def get_medians(self):
+        """Calculate medians to all three sides."""
+        # Median formulas: ma = 0.5 * sqrt(2*b² + 2*c² - a²)
+        ma = 0.5 * math.sqrt(2 * self.b**2 + 2 * self.c**2 - self.a**2)
+        mb = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.c**2 - self.b**2)
+        mc = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.b**2 - self.c**2)
+        
+        return {
+            'm_a': PrecisionSettings.round_value(ma, self.precision),
+            'm_b': PrecisionSettings.round_value(mb, self.precision),
+            'm_c': PrecisionSettings.round_value(mc, self.precision)
+        }
+    
+    def get_centroid_from_vertices(self, A=(0, 0), B=None, C=None):
+        """Calculate centroid coordinates from vertex coordinates.
+        
+        Args:
+            A: Vertex A coordinates (default: origin)
+            B: Vertex B coordinates (calculated if None)
+            C: Vertex C coordinates (calculated if None)
+        
+        Returns:
+            Centroid coordinates (x, y)
+        """
+        if B is None:
+            B = (self.b, 0)  # Place B on x-axis
+        if C is None:
+            C = (0, self.a)  # Place C on y-axis for right triangle
+        
+        # Centroid is average of vertices
+        centroid_x = (A[0] + B[0] + C[0]) / 3
+        centroid_y = (A[1] + B[1] + C[1]) / 3
+        
+        return (
+            PrecisionSettings.round_value(centroid_x, self.precision),
+            PrecisionSettings.round_value(centroid_y, self.precision)
+        )
+    
+    def get_circles_and_geometry(self):
+        """Get all circle and geometric properties."""
+        return {
+            'inradius': self.get_inradius(),
+            'circumradius': self.get_circumradius(),
+            'medians': self.get_medians(),
+            'centroid': self.get_centroid_from_vertices()
+        }
+    
     def get_rounded_values(self):
         """Get all triangle values rounded to current precision."""
         return {
@@ -600,6 +658,68 @@ class CommonTriangle:
             'h_a': PrecisionSettings.round_value((2 * area) / self.a, self.precision),
             'h_b': PrecisionSettings.round_value((2 * area) / self.b, self.precision),
             'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
+        }
+    
+    def get_inradius(self):
+        """Calculate inradius (radius of inscribed circle)."""
+        area = self.get_area()
+        semiperimeter = self.get_perimeter() / 2
+        return PrecisionSettings.round_value(area / semiperimeter, self.precision)
+    
+    def get_circumradius(self):
+        """Calculate circumradius (radius of circumscribed circle)."""
+        area = self.get_area()
+        return PrecisionSettings.round_value((self.a * self.b * self.c) / (4 * area), self.precision)
+    
+    def get_medians(self):
+        """Calculate medians to all three sides."""
+        # Median formulas: ma = 0.5 * sqrt(2*b² + 2*c² - a²)
+        ma = 0.5 * math.sqrt(2 * self.b**2 + 2 * self.c**2 - self.a**2)
+        mb = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.c**2 - self.b**2)
+        mc = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.b**2 - self.c**2)
+        
+        return {
+            'm_a': PrecisionSettings.round_value(ma, self.precision),
+            'm_b': PrecisionSettings.round_value(mb, self.precision),
+            'm_c': PrecisionSettings.round_value(mc, self.precision)
+        }
+    
+    def get_centroid_from_vertices(self, A=(0, 0), B=None, C=None):
+        """Calculate centroid coordinates from vertex coordinates.
+        
+        Args:
+            A: Vertex A coordinates (default: origin)
+            B: Vertex B coordinates (calculated if None)
+            C: Vertex C coordinates (calculated if None)
+        
+        Returns:
+            Centroid coordinates (x, y)
+        """
+        if B is None:
+            # Place B at distance c from A
+            B = (self.c, 0)
+        if C is None:
+            # Calculate C position using law of cosines
+            # C is at distance b from A and distance a from B
+            angle_A_rad = math.radians(self.angle_A)
+            C = (self.b * math.cos(angle_A_rad), self.b * math.sin(angle_A_rad))
+        
+        # Centroid is average of vertices
+        centroid_x = (A[0] + B[0] + C[0]) / 3
+        centroid_y = (A[1] + B[1] + C[1]) / 3
+        
+        return (
+            PrecisionSettings.round_value(centroid_x, self.precision),
+            PrecisionSettings.round_value(centroid_y, self.precision)
+        )
+    
+    def get_circles_and_geometry(self):
+        """Get all circle and geometric properties."""
+        return {
+            'inradius': self.get_inradius(),
+            'circumradius': self.get_circumradius(),
+            'medians': self.get_medians(),
+            'centroid': self.get_centroid_from_vertices()
         }
     
     def get_rounded_values(self):

@@ -189,6 +189,7 @@
                 if (result.success) {
                     const t = result.triangle;
                     const h = result.heights;
+                    const cg = result.circles_geometry;
                     resultDiv.innerHTML = `
                         <h3>Result:</h3>
                         <p><strong>Sides:</strong> a = ${t.a}, b = ${t.b}, c = ${t.c}</p>
@@ -196,6 +197,10 @@
                         <p><strong>Area:</strong> ${t.area}</p>
                         <p><strong>Perimeter:</strong> ${t.perimeter}</p>
                         <p><strong>Heights:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Incircle:</strong> r = ${cg.inradius}</p>
+                        <p><strong>Circumcircle:</strong> R = ${cg.circumradius}</p>
+                        <p><strong>Medians:</strong> m_a = ${cg.medians.m_a}, m_b = ${cg.medians.m_b}, m_c = ${cg.medians.m_c}</p>
+                        <p><strong>Centroid:</strong> (${cg.centroid[0]}, ${cg.centroid[1]})</p>
                         <p><strong>Mollweide verification:</strong> ${result.mollweide_valid ? 'Valid' : 'Invalid'}</p>
                         <p><strong>Precision:</strong> ${result.precision}</p>
                     `;
@@ -243,6 +248,7 @@
                 if (result.success) {
                     const t = result.triangle;
                     const h = result.heights;
+                    const cg = result.circles_geometry;
                     const type = result.triangle_type;
                     let typeStr = [];
                     if (type.right) typeStr.push('right');
@@ -256,6 +262,10 @@
                         <p><strong>Area:</strong> ${t.area}</p>
                         <p><strong>Perimeter:</strong> ${t.perimeter}</p>
                         <p><strong>Heights:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Incircle:</strong> r = ${cg.inradius}</p>
+                        <p><strong>Circumcircle:</strong> R = ${cg.circumradius}</p>
+                        <p><strong>Medians:</strong> m_a = ${cg.medians.m_a}, m_b = ${cg.medians.m_b}, m_c = ${cg.medians.m_c}</p>
+                        <p><strong>Centroid:</strong> (${cg.centroid[0]}, ${cg.centroid[1]})</p>
                         <p><strong>Triangle type:</strong> ${typeStr.length > 0 ? typeStr.join(', ') : 'general'}</p>
                         <p><strong>Mollweide verification:</strong> ${result.mollweide_valid ? 'Valid' : 'Invalid'}</p>
                         <p><strong>Precision:</strong> ${result.precision}</p>
