@@ -15,7 +15,7 @@ Comprehensive toolset for machining calculations with modern web interface. Incl
 - **Řemenice** - Pulley calculations and ratios
 - **Sinusová lišta** - Sine bar angle calculations
 - **Závitníkové vrtáky** - Tapping drill size calculations
-- **Trojúhelníky** - Right triangle and general triangle calculations with Mollweide verification
+- **Trojúhelníky** - Advanced triangle calculations with precision control, circles, medians, centroids
 
 ### Command Line Tools
 - `deleni` - Division calculations
@@ -143,30 +143,37 @@ strojarina/
 - Input thread diameter, pitch, and strength percentage
 - Supports 60-85% thread engagement options
 
-### Right Triangle Calculator
-- Calculate missing parameters from various input combinations
-- Support for: two sides, side+angle, hypotenuse+side, hypotenuse+angle
-- Mollweide equation verification for mathematical accuracy
-- Comprehensive input validation and error handling
-- Area and perimeter calculations
-- Height calculations to any side using formula: height = (2 × area) / base
-- **Incircle & Circumcircle**: Calculate radii of inscribed and circumscribed circles
-- **Medians**: Calculate all three medians using formula: m_a = 0.5 × √(2b² + 2c² - a²)
-- **Centroid**: Calculate centroid coordinates from vertex positions
-- **Precision Control**: 4 levels from 10 angular minutes (3 digits) to 1 second (6 digits)
+### Triangle Calculator (Advanced Geometry)
+**Comprehensive triangle analysis for precision machining applications**
 
-### General Triangle Calculator
-- Calculate any triangle from three parameters (sides/angles)
-- Support for: three sides, two sides + angle, one side + two angles
-- Law of sines and cosines implementation
-- Triangle type detection (right, isosceles, equilateral)
-- Mollweide equation verification for all triangle types
-- Heron's formula for area calculation
-- Height calculations to all three sides with validation
-- **Incircle & Circumcircle**: r = area/semiperimeter, R = (abc)/(4×area)
-- **Medians**: All three medians with precision rounding
-- **Centroid**: Geometric center calculation from vertices
-- **Advanced Geometry**: Complete geometric analysis for machining applications
+#### Right Triangle Calculator
+- **Input Combinations**: Two sides, side+angle, hypotenuse+side, hypotenuse+angle
+- **Mathematical Validation**: Mollweide equation verification, input consistency checks
+- **Basic Properties**: Area, perimeter, all angles and sides
+- **Heights**: Calculate to any side using h = (2 × area) / base
+- **Circles**: Incircle (r = area/semiperimeter), Circumcircle (R = c/2 for right triangles)
+- **Medians**: All three medians using m_a = 0.5 × √(2b² + 2c² - a²)
+- **Centroid**: Geometric center coordinates for CNC positioning
+
+#### General Triangle Calculator  
+- **Input Combinations**: Three sides, two sides + angle, one side + two angles
+- **Advanced Algorithms**: Law of sines/cosines, Heron's formula for area
+- **Triangle Classification**: Automatic detection (right, isosceles, equilateral)
+- **Complete Geometry**: Heights, circles, medians, centroid with precision control
+- **Professional Validation**: Triangle inequality, angle sum, Mollweide verification
+
+#### Precision Control System
+- **10min**: 3 significant digits (workshop precision)
+- **1min**: 4 significant digits (standard machining)
+- **10sec**: 5 significant digits (precision machining)
+- **1sec**: 6 significant digits (ultra-precision applications)
+
+#### Machining Applications
+- **CNC Programming**: Centroid coordinates for workpiece positioning
+- **Tool Path Planning**: Circle radii for clearance calculations
+- **Fixture Design**: Incircle/circumcircle for optimal clamping
+- **Quality Control**: Geometric verification using medians and heights
+- **Angular Measurements**: Precision angle calculations for setup
 
 ## Docker Usage
 
@@ -219,7 +226,11 @@ python3 tests/testTriangles.py  # Right triangle tests
 python3 -c "from deleni import DeliciHlava; h = DeliciHlava(); print(h.vypocti_pocet_der(40))"
 python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print(t)"
 python3 -c "from triangles import CommonTriangle; t = CommonTriangle(a=3, b=4, c=5); print(t)"
-python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print('Heights:', t.get_all_heights()); print('Circles:', t.get_circles_and_geometry())"
+# Complete triangle analysis
+python3 -c "from triangles import RightTriangle; t = RightTriangle(precision='1sec', a=3, b=4); print('Complete geometry:', t.get_circles_and_geometry())"
+
+# Precision comparison
+python3 -c "from triangles import CommonTriangle; t1 = CommonTriangle(precision='10min', a=5, b=7, c=9); t2 = CommonTriangle(precision='1sec', a=5, b=7, c=9); print('10min:', t1.get_inradius()); print('1sec:', t2.get_inradius())"
 ```
 
 ### Docker Development
