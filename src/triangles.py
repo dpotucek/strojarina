@@ -10,10 +10,38 @@ File: triangles.py
 import math
 
 
+class PrecisionSettings:
+    """Precision settings for triangle calculations based on angular precision."""
+    
+    PRECISIONS = {
+        '10min': 3,    # 10 angular minutes -> 3 significant digits
+        '1min': 4,     # 1 angular minute -> 4 significant digits  
+        '10sec': 5,    # 10 angular seconds -> 5 significant digits
+        '1sec': 6      # 1 angular second -> 6 significant digits
+    }
+    
+    DEFAULT = '10min'
+    
+    @classmethod
+    def get_digits(cls, precision=None):
+        """Get number of significant digits for given precision."""
+        if precision is None:
+            precision = cls.DEFAULT
+        return cls.PRECISIONS.get(precision, cls.PRECISIONS[cls.DEFAULT])
+    
+    @classmethod
+    def round_value(cls, value, precision=None):
+        """Round value to specified precision."""
+        if value == 0:
+            return 0.0
+        digits = cls.get_digits(precision)
+        return round(value, digits - int(math.floor(math.log10(abs(value)))) - 1)
+
+
 class RightTriangle:
     """Class for right triangle calculations with Mollweide equation verification."""
     
-    def __init__(self, **kwargs):
+    def __init__(self, precision=None, **kwargs):
         """Initialize triangle with various parameter combinations.
         
         Supported combinations:
@@ -28,6 +56,7 @@ class RightTriangle:
         self.angle_A = None  # angle opposite to side a (degrees)
         self.angle_B = None  # angle opposite to side b (degrees)
         self.angle_C = 90.0  # right angle
+        self.precision = precision  # angular precision setting
         
         self._validate_and_calculate(**kwargs)
     
@@ -234,11 +263,11 @@ class RightTriangle:
         """
         area = self.get_area()
         if side == 'a':
-            return (2 * area) / self.a
+            return PrecisionSettings.round_value((2 * area) / self.a, self.precision)
         elif side == 'b':
-            return (2 * area) / self.b
+            return PrecisionSettings.round_value((2 * area) / self.b, self.precision)
         elif side == 'c':
-            return (2 * area) / self.c
+            return PrecisionSettings.round_value((2 * area) / self.c, self.precision)
         else:
             raise ValueError("Side must be 'a', 'b', or 'c'")
     
@@ -250,14 +279,33 @@ class RightTriangle:
         """
         area = self.get_area()
         return {
-            'h_a': (2 * area) / self.a,
-            'h_b': (2 * area) / self.b,
-            'h_c': (2 * area) / self.c
+            'h_a': PrecisionSettings.round_value((2 * area) / self.a, self.precision),
+            'h_b': PrecisionSettings.round_value((2 * area) / self.b, self.precision),
+            'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
+        }
+    
+    def get_rounded_values(self):
+        """Get all triangle values rounded to current precision."""
+        return {
+            'a': PrecisionSettings.round_value(self.a, self.precision),
+            'b': PrecisionSettings.round_value(self.b, self.precision),
+            'c': PrecisionSettings.round_value(self.c, self.precision),
+            'angle_A': PrecisionSettings.round_value(self.angle_A, self.precision),
+            'angle_B': PrecisionSettings.round_value(self.angle_B, self.precision),
+            'angle_C': 90.0,
+            'area': PrecisionSettings.round_value(self.get_area(), self.precision),
+            'perimeter': PrecisionSettings.round_value(self.get_perimeter(), self.precision)
         }
     
     def __str__(self):
-        return (f"Right Triangle: a={self.a:.3f}, b={self.b:.3f}, c={self.c:.3f}, "
-                f"∠A={self.angle_A:.1f}°, ∠B={self.angle_B:.1f}°, ∠C=90.0°")
+        digits = PrecisionSettings.get_digits(self.precision)
+        a = PrecisionSettings.round_value(self.a, self.precision)
+        b = PrecisionSettings.round_value(self.b, self.precision)
+        c = PrecisionSettings.round_value(self.c, self.precision)
+        angle_A = PrecisionSettings.round_value(self.angle_A, self.precision)
+        angle_B = PrecisionSettings.round_value(self.angle_B, self.precision)
+        return (f"Right Triangle: a={a}, b={b}, c={c}, "
+                f"∠A={angle_A}°, ∠B={angle_B}°, ∠C=90.0°")
     
     def __repr__(self):
         return f"RightTriangle(a={self.a}, b={self.b}, c={self.c})"
@@ -266,7 +314,7 @@ class RightTriangle:
 class CommonTriangle:
     """Class for general triangle calculations with law of sines/cosines and Mollweide verification."""
     
-    def __init__(self, **kwargs):
+    def __init__(self, precision=None, **kwargs):
         """Initialize triangle with various parameter combinations.
         
         Supported combinations:
@@ -280,6 +328,7 @@ class CommonTriangle:
         self.angle_A = None  # angle opposite to side a (degrees)
         self.angle_B = None  # angle opposite to side b (degrees)
         self.angle_C = None  # angle opposite to side c (degrees)
+        self.precision = precision  # angular precision setting
         
         self._validate_and_calculate(**kwargs)
     
@@ -532,11 +581,11 @@ class CommonTriangle:
         """
         area = self.get_area()
         if side == 'a':
-            return (2 * area) / self.a
+            return PrecisionSettings.round_value((2 * area) / self.a, self.precision)
         elif side == 'b':
-            return (2 * area) / self.b
+            return PrecisionSettings.round_value((2 * area) / self.b, self.precision)
         elif side == 'c':
-            return (2 * area) / self.c
+            return PrecisionSettings.round_value((2 * area) / self.c, self.precision)
         else:
             raise ValueError("Side must be 'a', 'b', or 'c'")
     
@@ -548,9 +597,22 @@ class CommonTriangle:
         """
         area = self.get_area()
         return {
-            'h_a': (2 * area) / self.a,
-            'h_b': (2 * area) / self.b,
-            'h_c': (2 * area) / self.c
+            'h_a': PrecisionSettings.round_value((2 * area) / self.a, self.precision),
+            'h_b': PrecisionSettings.round_value((2 * area) / self.b, self.precision),
+            'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
+        }
+    
+    def get_rounded_values(self):
+        """Get all triangle values rounded to current precision."""
+        return {
+            'a': PrecisionSettings.round_value(self.a, self.precision),
+            'b': PrecisionSettings.round_value(self.b, self.precision),
+            'c': PrecisionSettings.round_value(self.c, self.precision),
+            'angle_A': PrecisionSettings.round_value(self.angle_A, self.precision),
+            'angle_B': PrecisionSettings.round_value(self.angle_B, self.precision),
+            'angle_C': PrecisionSettings.round_value(self.angle_C, self.precision),
+            'area': PrecisionSettings.round_value(self.get_area(), self.precision),
+            'perimeter': PrecisionSettings.round_value(self.get_perimeter(), self.precision)
         }
     
     def is_right_triangle(self, tolerance=1e-6):
@@ -572,8 +634,15 @@ class CommonTriangle:
                 abs(self.a - self.c) < tolerance)
     
     def __str__(self):
-        return (f"Triangle: a={self.a:.3f}, b={self.b:.3f}, c={self.c:.3f}, "
-                f"∠A={self.angle_A:.1f}°, ∠B={self.angle_B:.1f}°, ∠C={self.angle_C:.1f}°")
+        digits = PrecisionSettings.get_digits(self.precision)
+        a = PrecisionSettings.round_value(self.a, self.precision)
+        b = PrecisionSettings.round_value(self.b, self.precision)
+        c = PrecisionSettings.round_value(self.c, self.precision)
+        angle_A = PrecisionSettings.round_value(self.angle_A, self.precision)
+        angle_B = PrecisionSettings.round_value(self.angle_B, self.precision)
+        angle_C = PrecisionSettings.round_value(self.angle_C, self.precision)
+        return (f"Triangle: a={a}, b={b}, c={c}, "
+                f"∠A={angle_A}°, ∠B={angle_B}°, ∠C={angle_C}°")
     
     def __repr__(self):
         return f"CommonTriangle(a={self.a}, b={self.b}, c={self.c})"

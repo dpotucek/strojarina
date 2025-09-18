@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trojúhelníky - Strojarina</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .language-switch a { margin: 0 5px; color: #007bff; text-decoration: none; }
+        .language-switch a.active { font-weight: bold; color: #333; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab-button { padding: 10px 20px; background: #ddd; cursor: pointer; border: none; margin-right: 5px; border-radius: 4px 4px 0 0; }
+        .tab-button.active { background: #007bff; color: white; }
+        .tab-content { display: none; padding: 20px; border: 1px solid #ddd; border-radius: 0 4px 4px 4px; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        .error { color: red; }
+        .navigation { margin-top: 30px; }
+        .back-link { color: #007bff; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trojúhelníky</h1>
+            <div class="language-switch">
+                <a href="/en/triangles">EN</a> | <a href="/triangles" class="active">CZ</a>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'right-triangle')">Pravoúhlý trojúhelník</button>
+            <button class="tab-button" onclick="openTab(event, 'common-triangle')">Obecný trojúhelník</button>
+        </div>
+
+        <div id="right-triangle" class="tab-content active">
+            <h2>Pravoúhlý trojúhelník</h2>
+            <form id="right-triangle-form">
+                <div class="form-group">
+                    <label for="precision">Přesnost:</label>
+                    <select id="precision" name="precision">
+                        <option value="10min" selected>10 úhlových minut (3 platné číslice)</option>
+                        <option value="1min">1 úhlová minuta (4 platné číslice)</option>
+                        <option value="10sec">10 úhlových sekund (5 platných číslic)</option>
+                        <option value="1sec">1 úhlová sekunda (6 platných číslic)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="a">Strana a:</label>
+                    <input type="number" id="a" name="a" step="any" placeholder="Strana protilehlá úhlu A">
+                </div>
+
+                <div class="form-group">
+                    <label for="b">Strana b:</label>
+                    <input type="number" id="b" name="b" step="any" placeholder="Strana protilehlá úhlu B">
+                </div>
+
+                <div class="form-group">
+                    <label for="c">Přepona c:</label>
+                    <input type="number" id="c" name="c" step="any" placeholder="Přepona">
+                </div>
+
+                <div class="form-group">
+                    <label for="angle_A">Úhel A (°):</label>
+                    <input type="number" id="angle_A" name="angle_A" step="any" placeholder="Úhel protilehlý straně a">
+                </div>
+
+                <div class="form-group">
+                    <label for="angle_B">Úhel B (°):</label>
+                    <input type="number" id="angle_B" name="angle_B" step="any" placeholder="Úhel protilehlý straně b">
+                </div>
+
+                <button type="submit">Vypočítat</button>
+            </form>
+
+            <div id="right-result" class="result"></div>
+        </div>
+
+        <div id="common-triangle" class="tab-content">
+            <h2>Obecný trojúhelník</h2>
+            <form id="common-triangle-form">
+                <div class="form-group">
+                    <label for="common-precision">Přesnost:</label>
+                    <select id="common-precision" name="precision">
+                        <option value="10min" selected>10 úhlových minut (3 platné číslice)</option>
+                        <option value="1min">1 úhlová minuta (4 platné číslice)</option>
+                        <option value="10sec">10 úhlových sekund (5 platných číslic)</option>
+                        <option value="1sec">1 úhlová sekunda (6 platných číslic)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="common-a">Strana a:</label>
+                    <input type="number" id="common-a" name="a" step="any" placeholder="Strana protilehlá úhlu A">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-b">Strana b:</label>
+                    <input type="number" id="common-b" name="b" step="any" placeholder="Strana protilehlá úhlu B">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-c">Strana c:</label>
+                    <input type="number" id="common-c" name="c" step="any" placeholder="Strana protilehlá úhlu C">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-angle_A">Úhel A (°):</label>
+                    <input type="number" id="common-angle_A" name="angle_A" step="any" placeholder="Úhel protilehlý straně a">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-angle_B">Úhel B (°):</label>
+                    <input type="number" id="common-angle_B" name="angle_B" step="any" placeholder="Úhel protilehlý straně b">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-angle_C">Úhel C (°):</label>
+                    <input type="number" id="common-angle_C" name="angle_C" step="any" placeholder="Úhel protilehlý straně c">
+                </div>
+
+                <button type="submit">Vypočítat</button>
+            </form>
+
+            <div id="common-result" class="result"></div>
+        </div>
+
+        <div class="navigation">
+            <a href="/" class="back-link">← Zpět na hlavní stránku</a>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        document.getElementById('right-triangle-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (value !== '') {
+                    data[key] = value;
+                }
+            }
+            
+            // Validate input count
+            const inputCount = Object.keys(data).filter(key => key !== 'precision').length;
+            if (inputCount < 2) {
+                document.getElementById('right-result').innerHTML = '<p class="error">Zadejte alespoň 2 parametry</p>';
+                return;
+            }
+            if (inputCount > 2) {
+                document.getElementById('right-result').innerHTML = '<p class="error">Zadejte maximálně 2 parametry</p>';
+                return;
+            }
+            
+            fetch('/api/triangles/right', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultDiv = document.getElementById('right-result');
+                if (result.success) {
+                    const t = result.triangle;
+                    const h = result.heights;
+                    resultDiv.innerHTML = `
+                        <h3>Výsledek:</h3>
+                        <p><strong>Strany:</strong> a = ${t.a}, b = ${t.b}, c = ${t.c}</p>
+                        <p><strong>Úhly:</strong> A = ${t.angle_A}°, B = ${t.angle_B}°, C = 90.0°</p>
+                        <p><strong>Obsah:</strong> ${t.area}</p>
+                        <p><strong>Obvod:</strong> ${t.perimeter}</p>
+                        <p><strong>Výšky:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Mollweide ověření:</strong> ${result.mollweide_valid ? 'Platné' : 'Neplatné'}</p>
+                        <p><strong>Přesnost:</strong> ${result.precision}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">Chyba: ${result.error}</p>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('right-result').innerHTML = `<p class="error">Chyba spojení: ${error.message}</p>`;
+            });
+        });
+
+        document.getElementById('common-triangle-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (value !== '') {
+                    data[key] = value;
+                }
+            }
+            
+            // Validate input count
+            const inputCount = Object.keys(data).filter(key => key !== 'precision').length;
+            if (inputCount < 3) {
+                document.getElementById('common-result').innerHTML = '<p class="error">Zadejte alespoň 3 parametry</p>';
+                return;
+            }
+            if (inputCount > 3) {
+                document.getElementById('common-result').innerHTML = '<p class="error">Zadejte maximálně 3 parametry</p>';
+                return;
+            }
+            
+            fetch('/api/triangles/common', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultDiv = document.getElementById('common-result');
+                if (result.success) {
+                    const t = result.triangle;
+                    const h = result.heights;
+                    const type = result.triangle_type;
+                    let typeStr = [];
+                    if (type.right) typeStr.push('pravoúhlý');
+                    if (type.isosceles) typeStr.push('rovnoramenný');
+                    if (type.equilateral) typeStr.push('rovnostranný');
+                    
+                    resultDiv.innerHTML = `
+                        <h3>Výsledek:</h3>
+                        <p><strong>Strany:</strong> a = ${t.a}, b = ${t.b}, c = ${t.c}</p>
+                        <p><strong>Úhly:</strong> A = ${t.angle_A}°, B = ${t.angle_B}°, C = ${t.angle_C}°</p>
+                        <p><strong>Obsah:</strong> ${t.area}</p>
+                        <p><strong>Obvod:</strong> ${t.perimeter}</p>
+                        <p><strong>Výšky:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Typ trojúhelníku:</strong> ${typeStr.length > 0 ? typeStr.join(', ') : 'obecný'}</p>
+                        <p><strong>Mollweide ověření:</strong> ${result.mollweide_valid ? 'Platné' : 'Neplatné'}</p>
+                        <p><strong>Přesnost:</strong> ${result.precision}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">Chyba: ${result.error}</p>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('common-result').innerHTML = `<p class="error">Chyba spojení: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>

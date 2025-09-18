@@ -14,6 +14,7 @@ from plochyNaHrideli import PlochyNaHrideli
 from pulleys import calculate2_pulleys, find_driven_diameter
 from sineBar import calculate_link_sine_bar, calculate_contact_sine_bar
 from tappingDrills import MetricThread
+from triangles import RightTriangle, CommonTriangle, PrecisionSettings
 import math
 
 # Thread pitch constants for performance
@@ -130,6 +131,14 @@ def tapping_drills():
 @app.route('/en/tapping-drills')
 def tapping_drills_en():
     return render_template('tapping_drills_en.html')
+
+@app.route('/triangles')
+def triangles():
+    return render_template('triangles.html')
+
+@app.route('/en/triangles')
+def triangles_en():
+    return render_template('triangles_en.html')
 
 @app.route('/api/pocty', methods=['POST'])
 def vypocitat_pocty():
@@ -509,6 +518,69 @@ def calculate_tapping_drill():
             'thread_pitch': thread_pitch,
             'thread_strength': thread_strength,
             'drill_diameter': round(drill_diameter, 3)
+        }
+    except Exception as e:
+        result = {
+            'success': False,
+            'error': str(e)
+        }
+    
+    return jsonify(result)
+
+@app.route('/api/triangles/right', methods=['POST'])
+def calculate_right_triangle():
+    data = request.json
+    precision = data.get('precision', '10min')
+    
+    try:
+        params = {}
+        for key in ['a', 'b', 'c', 'angle_A', 'angle_B']:
+            value = data.get(key)
+            if value is not None and value != '':
+                params[key] = safe_float(value, key)
+        
+        triangle = RightTriangle(precision=precision, **params)
+        
+        result = {
+            'success': True,
+            'precision': precision,
+            'triangle': triangle.get_rounded_values(),
+            'heights': triangle.get_all_heights(),
+            'mollweide_valid': triangle.verify_mollweide()
+        }
+    except Exception as e:
+        result = {
+            'success': False,
+            'error': str(e)
+        }
+    
+    return jsonify(result)
+
+@app.route('/api/triangles/common', methods=['POST'])
+def calculate_common_triangle():
+    data = request.json
+    precision = data.get('precision', '10min')
+    
+    try:
+        params = {}
+        for key in ['a', 'b', 'c', 'angle_A', 'angle_B', 'angle_C']:
+            value = data.get(key)
+            if value is not None and value != '':
+                params[key] = safe_float(value, key)
+        
+        triangle = CommonTriangle(precision=precision, **params)
+        
+        result = {
+            'success': True,
+            'precision': precision,
+            'triangle': triangle.get_rounded_values(),
+            'heights': triangle.get_all_heights(),
+            'mollweide_valid': triangle.verify_mollweide(),
+            'triangle_type': {
+                'right': triangle.is_right_triangle(),
+                'isosceles': triangle.is_isosceles(),
+                'equilateral': triangle.is_equilateral()
+            }
         }
     except Exception as e:
         result = {

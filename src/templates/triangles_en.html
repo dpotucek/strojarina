@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangles - Strojarina</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .language-switch a { margin: 0 5px; color: #007bff; text-decoration: none; }
+        .language-switch a.active { font-weight: bold; color: #333; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab-button { padding: 10px 20px; background: #ddd; cursor: pointer; border: none; margin-right: 5px; border-radius: 4px 4px 0 0; }
+        .tab-button.active { background: #007bff; color: white; }
+        .tab-content { display: none; padding: 20px; border: 1px solid #ddd; border-radius: 0 4px 4px 4px; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+        .error { color: red; }
+        .navigation { margin-top: 30px; }
+        .back-link { color: #007bff; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Triangles</h1>
+            <div class="language-switch">
+                <a href="/en/triangles" class="active">EN</a> | <a href="/triangles">CZ</a>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'right-triangle')">Right Triangle</button>
+            <button class="tab-button" onclick="openTab(event, 'common-triangle')">General Triangle</button>
+        </div>
+
+        <div id="right-triangle" class="tab-content active">
+            <h2>Right Triangle</h2>
+            <form id="right-triangle-form">
+                <div class="form-group">
+                    <label for="precision">Precision:</label>
+                    <select id="precision" name="precision">
+                        <option value="10min" selected>10 angular minutes (3 significant digits)</option>
+                        <option value="1min">1 angular minute (4 significant digits)</option>
+                        <option value="10sec">10 angular seconds (5 significant digits)</option>
+                        <option value="1sec">1 angular second (6 significant digits)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="a">Side a:</label>
+                    <input type="number" id="a" name="a" step="any" placeholder="Side opposite to angle A">
+                </div>
+
+                <div class="form-group">
+                    <label for="b">Side b:</label>
+                    <input type="number" id="b" name="b" step="any" placeholder="Side opposite to angle B">
+                </div>
+
+                <div class="form-group">
+                    <label for="c">Hypotenuse c:</label>
+                    <input type="number" id="c" name="c" step="any" placeholder="Hypotenuse">
+                </div>
+
+                <div class="form-group">
+                    <label for="angle_A">Angle A (°):</label>
+                    <input type="number" id="angle_A" name="angle_A" step="any" placeholder="Angle opposite to side a">
+                </div>
+
+                <div class="form-group">
+                    <label for="angle_B">Angle B (°):</label>
+                    <input type="number" id="angle_B" name="angle_B" step="any" placeholder="Angle opposite to side b">
+                </div>
+
+                <button type="submit">Calculate</button>
+            </form>
+
+            <div id="right-result" class="result"></div>
+        </div>
+
+        <div id="common-triangle" class="tab-content">
+            <h2>General Triangle</h2>
+            <form id="common-triangle-form">
+                <div class="form-group">
+                    <label for="common-precision">Precision:</label>
+                    <select id="common-precision" name="precision">
+                        <option value="10min" selected>10 angular minutes (3 significant digits)</option>
+                        <option value="1min">1 angular minute (4 significant digits)</option>
+                        <option value="10sec">10 angular seconds (5 significant digits)</option>
+                        <option value="1sec">1 angular second (6 significant digits)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="common-a">Side a:</label>
+                    <input type="number" id="common-a" name="a" step="any" placeholder="Side opposite to angle A">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-b">Side b:</label>
+                    <input type="number" id="common-b" name="b" step="any" placeholder="Side opposite to angle B">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-c">Side c:</label>
+                    <input type="number" id="common-c" name="c" step="any" placeholder="Side opposite to angle C">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-angle_A">Angle A (°):</label>
+                    <input type="number" id="common-angle_A" name="angle_A" step="any" placeholder="Angle opposite to side a">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-angle_B">Angle B (°):</label>
+                    <input type="number" id="common-angle_B" name="angle_B" step="any" placeholder="Angle opposite to side b">
+                </div>
+
+                <div class="form-group">
+                    <label for="common-angle_C">Angle C (°):</label>
+                    <input type="number" id="common-angle_C" name="angle_C" step="any" placeholder="Angle opposite to side c">
+                </div>
+
+                <button type="submit">Calculate</button>
+            </form>
+
+            <div id="common-result" class="result"></div>
+        </div>
+
+        <div class="navigation">
+            <a href="/en" class="back-link">← Back to main page</a>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        document.getElementById('right-triangle-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (value !== '') {
+                    data[key] = value;
+                }
+            }
+            
+            // Validate input count
+            const inputCount = Object.keys(data).filter(key => key !== 'precision').length;
+            if (inputCount < 2) {
+                document.getElementById('right-result').innerHTML = '<p class="error">Enter at least 2 parameters</p>';
+                return;
+            }
+            if (inputCount > 2) {
+                document.getElementById('right-result').innerHTML = '<p class="error">Enter maximum 2 parameters</p>';
+                return;
+            }
+            
+            fetch('/api/triangles/right', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultDiv = document.getElementById('right-result');
+                if (result.success) {
+                    const t = result.triangle;
+                    const h = result.heights;
+                    resultDiv.innerHTML = `
+                        <h3>Result:</h3>
+                        <p><strong>Sides:</strong> a = ${t.a}, b = ${t.b}, c = ${t.c}</p>
+                        <p><strong>Angles:</strong> A = ${t.angle_A}°, B = ${t.angle_B}°, C = 90.0°</p>
+                        <p><strong>Area:</strong> ${t.area}</p>
+                        <p><strong>Perimeter:</strong> ${t.perimeter}</p>
+                        <p><strong>Heights:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Mollweide verification:</strong> ${result.mollweide_valid ? 'Valid' : 'Invalid'}</p>
+                        <p><strong>Precision:</strong> ${result.precision}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">Error: ${result.error}</p>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('right-result').innerHTML = `<p class="error">Connection error: ${error.message}</p>`;
+            });
+        });
+
+        document.getElementById('common-triangle-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (value !== '') {
+                    data[key] = value;
+                }
+            }
+            
+            // Validate input count
+            const inputCount = Object.keys(data).filter(key => key !== 'precision').length;
+            if (inputCount < 3) {
+                document.getElementById('common-result').innerHTML = '<p class="error">Enter at least 3 parameters</p>';
+                return;
+            }
+            if (inputCount > 3) {
+                document.getElementById('common-result').innerHTML = '<p class="error">Enter maximum 3 parameters</p>';
+                return;
+            }
+            
+            fetch('/api/triangles/common', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                const resultDiv = document.getElementById('common-result');
+                if (result.success) {
+                    const t = result.triangle;
+                    const h = result.heights;
+                    const type = result.triangle_type;
+                    let typeStr = [];
+                    if (type.right) typeStr.push('right');
+                    if (type.isosceles) typeStr.push('isosceles');
+                    if (type.equilateral) typeStr.push('equilateral');
+                    
+                    resultDiv.innerHTML = `
+                        <h3>Result:</h3>
+                        <p><strong>Sides:</strong> a = ${t.a}, b = ${t.b}, c = ${t.c}</p>
+                        <p><strong>Angles:</strong> A = ${t.angle_A}°, B = ${t.angle_B}°, C = ${t.angle_C}°</p>
+                        <p><strong>Area:</strong> ${t.area}</p>
+                        <p><strong>Perimeter:</strong> ${t.perimeter}</p>
+                        <p><strong>Heights:</strong> h_a = ${h.h_a}, h_b = ${h.h_b}, h_c = ${h.h_c}</p>
+                        <p><strong>Triangle type:</strong> ${typeStr.length > 0 ? typeStr.join(', ') : 'general'}</p>
+                        <p><strong>Mollweide verification:</strong> ${result.mollweide_valid ? 'Valid' : 'Invalid'}</p>
+                        <p><strong>Precision:</strong> ${result.precision}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">Error: ${result.error}</p>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('common-result').innerHTML = `<p class="error">Connection error: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
