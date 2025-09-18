@@ -15,7 +15,7 @@ Comprehensive toolset for machining calculations with modern web interface. Incl
 - **Řemenice** - Pulley calculations and ratios
 - **Sinusová lišta** - Sine bar angle calculations
 - **Závitníkové vrtáky** - Tapping drill size calculations
-- **Trojúhelníky** - Right triangle calculations with Mollweide verification
+- **Trojúhelníky** - Right triangle and general triangle calculations with Mollweide verification
 
 ### Command Line Tools
 - `deleni` - Division calculations
@@ -149,6 +149,16 @@ strojarina/
 - Mollweide equation verification for mathematical accuracy
 - Comprehensive input validation and error handling
 - Area and perimeter calculations
+- Height calculations to any side using formula: height = (2 × area) / base
+
+### General Triangle Calculator
+- Calculate any triangle from three parameters (sides/angles)
+- Support for: three sides, two sides + angle, one side + two angles
+- Law of sines and cosines implementation
+- Triangle type detection (right, isosceles, equilateral)
+- Mollweide equation verification for all triangle types
+- Heron's formula for area calculation
+- Height calculations to all three sides with validation
 
 ## Docker Usage
 
@@ -200,6 +210,8 @@ python3 tests/testTriangles.py  # Right triangle tests
 # Python interactive
 python3 -c "from deleni import DeliciHlava; h = DeliciHlava(); print(h.vypocti_pocet_der(40))"
 python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print(t)"
+python3 -c "from triangles import CommonTriangle; t = CommonTriangle(a=3, b=4, c=5); print(t)"
+python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print('Heights:', t.get_all_heights())"
 ```
 
 ### Docker Development
