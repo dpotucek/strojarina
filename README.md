@@ -59,6 +59,7 @@ make web             # Start web GUI on port 5000
 - Python 3.9+
 - Poetry for dependency management
 - Flask for web interface
+- **requests** - HTTP library for API client examples (optional)
 
 ## Project Structure
 ```
@@ -68,8 +69,9 @@ strojarina/
 │   ├── differentialThread.py # Differential threading
 │   ├── DivisionPlatePlain.py # Division plate calculations
 │   ├── findThread.py      # Thread database search
-│   ├── triangles.py       # Right triangle calculations
-│   ├── gui_deleni_web.py  # Web GUI Flask server
+│   ├── triangles.py       # Triangle calculations with advanced geometry
+│   ├── gui_deleni_web.py  # Web GUI Flask server with REST API
+│   ├── apiExample.py      # API integration examples
 │   └── templates/         # HTML templates for web GUI
 ├── tests/                 # Unit tests
 │   ├── testDeleni.py      # Division head tests
@@ -77,6 +79,7 @@ strojarina/
 │   └── ...                # Other test files
 ├── data/                  # Thread database files
 ├── wheels/                # DaPTools wheel distributions
+├── API_CONFIGURATION.md   # API integration guide
 ├── Dockerfile             # Container definition
 ├── Makefile              # Automation commands
 └── pyproject.toml        # Poetry configuration
@@ -231,12 +234,28 @@ python3 -c "from triangles import RightTriangle; t = RightTriangle(precision='1s
 
 # Precision comparison
 python3 -c "from triangles import CommonTriangle; t1 = CommonTriangle(precision='10min', a=5, b=7, c=9); t2 = CommonTriangle(precision='1sec', a=5, b=7, c=9); print('10min:', t1.get_inradius()); print('1sec:', t2.get_inradius())"
+
+# API usage example
+python src/apiExample.py
 ```
 
 ### Docker Development
 ```bash
 # Development with volume mount
 docker run --rm -p 5000:5000 -v $(pwd):/app strojarina:latest
+```
+
+### API Integration
+**For external program integration, see [API_CONFIGURATION.md](API_CONFIGURATION.md)**
+
+```bash
+# Start API server
+make web
+
+# Run API examples (requires requests: pip install requests)
+python src/apiExample.py
+
+# API available at http://localhost:5000/api/
 ```
 
 ### Updating Dependencies
