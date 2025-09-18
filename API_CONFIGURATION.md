@@ -144,6 +144,88 @@ var response = await client.PostAsync(
 var result = await response.Content.ReadAsStringAsync();
 ```
 
+### Java
+```java
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
+// Using Jackson for JSON processing
+ObjectMapper mapper = new ObjectMapper();
+HttpClient client = HttpClient.newHttpClient();
+
+// Create request data
+var data = mapper.createObjectNode();
+data.put("a", 3);
+data.put("b", 4);
+data.put("precision", "1sec");
+
+// Build request
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("http://localhost:5000/api/triangles/right"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(data)))
+    .build();
+
+// Send request
+HttpResponse<String> response = client.send(request, 
+    HttpResponse.BodyHandlers.ofString());
+
+// Parse response
+if (response.statusCode() == 200) {
+    JsonNode result = mapper.readTree(response.body());
+    if (result.get("success").asBoolean()) {
+        JsonNode triangle = result.get("triangle");
+        System.out.println("Hypotenuse: " + triangle.get("c").asDouble());
+        System.out.println("Area: " + triangle.get("area").asDouble());
+    }
+}
+```
+
+### Java (Spring Boot)
+```java
+@RestController
+public class TriangleController {
+    
+    @Autowired
+    private RestTemplate restTemplate;
+    
+    @PostMapping("/calculate")
+    public ResponseEntity<?> calculateTriangle(@RequestBody TriangleRequest request) {
+        String url = "http://localhost:5000/api/triangles/right";
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        HttpEntity<TriangleRequest> entity = new HttpEntity<>(request, headers);
+        
+        try {
+            ResponseEntity<TriangleResponse> response = restTemplate.postForEntity(
+                url, entity, TriangleResponse.class);
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("API call failed: " + e.getMessage());
+        }
+    }
+}
+
+// Data classes
+class TriangleRequest {
+    public double a, b;
+    public String precision = "1min";
+}
+
+class TriangleResponse {
+    public boolean success;
+    public Triangle triangle;
+    public Map<String, Double> heights;
+    public CirclesGeometry circles_geometry;
+}
+```
+
 ## Zpracování chyb
 
 ### Chybové odpovědi
@@ -179,6 +261,42 @@ triangle_data = {"a": part_width, "b": part_height, "precision": "1sec"}
 response = requests.post(api_url, json=triangle_data)
 centroid = response.json()["circles_geometry"]["centroid"]
 # Použití centroidu pro pozicování obrobku
+```
+
+### Java CAD/CAM Integration
+```java
+// CNC programming with triangle calculations
+public class CNCProgrammer {
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper();
+    
+    public Point2D calculateCentroid(double partWidth, double partHeight) {
+        var data = mapper.createObjectNode();
+        data.put("a", partWidth);
+        data.put("b", partHeight);
+        data.put("precision", "1sec");
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:5000/api/triangles/right"))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(data.toString()))
+            .build();
+            
+        try {
+            HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+            JsonNode result = mapper.readTree(response.body());
+            JsonNode centroid = result.get("circles_geometry").get("centroid");
+            
+            return new Point2D.Double(
+                centroid.get(0).asDouble(),
+                centroid.get(1).asDouble()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to calculate centroid", e);
+        }
+    }
+}
 ```
 
 ### Kontrola kvality
