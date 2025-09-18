@@ -542,21 +542,63 @@ class CommonTriangle:
         sides = [self.a, self.b, self.c]
         angles = [self.angle_A, self.angle_B, self.angle_C]
         
-        if angle_index == 0:  # angle_A known, need to find side a
-            b, c = sides[1], sides[2]
-            angle_A = angles[0]
+        if angle_index == 0 and self.a is None:  # angle_A known, need to find side a
+            b, c = self.b, self.c
+            if b is None or c is None:
+                raise ValueError("Need two sides to calculate third side with law of cosines")
+            angle_A = self.angle_A
             self.a = math.sqrt(b**2 + c**2 - 2*b*c*math.cos(math.radians(angle_A)))
-        elif angle_index == 1:  # angle_B known, need to find side b
-            a, c = sides[0], sides[2]
-            angle_B = angles[1]
+        elif angle_index == 1 and self.b is None:  # angle_B known, need to find side b
+            a, c = self.a, self.c
+            if a is None or c is None:
+                raise ValueError("Need two sides to calculate third side with law of cosines")
+            angle_B = self.angle_B
             self.b = math.sqrt(a**2 + c**2 - 2*a*c*math.cos(math.radians(angle_B)))
-        else:  # angle_C known, need to find side c
-            a, b = sides[0], sides[1]
-            angle_C = angles[2]
+        elif angle_index == 2 and self.c is None:  # angle_C known, need to find side c
+            a, b = self.a, self.b
+            if a is None or b is None:
+                raise ValueError("Need two sides to calculate third side with law of cosines")
+            angle_C = self.angle_C
             self.c = math.sqrt(a**2 + b**2 - 2*a*b*math.cos(math.radians(angle_C)))
+        else:
+            # Use law of sines instead
+            self._solve_with_law_of_sines(side_indices, angle_index)
+            return
         
         # Calculate remaining angles using law of cosines
         self._calculate_remaining_angles()
+    
+    def _solve_with_law_of_sines(self, side_indices, angle_index):
+        """Solve using law of sines when we have two sides and one angle."""
+        # For case like a=3, b=4, angle_A=56
+        # We use law of sines: a/sin(A) = b/sin(B)
+        # So sin(B) = b * sin(A) / a
+        
+        if angle_index == 0 and self.a is not None and self.b is not None:
+            # We have a, b, angle_A - find angle_B
+            sin_B = self.b * math.sin(math.radians(self.angle_A)) / self.a
+            if sin_B > 1:
+                raise ValueError(f"No valid triangle exists: sin(B) = {sin_B:.3f} > 1. For sides a={self.a}, b={self.b}, angle A must be ≤ {math.degrees(math.asin(self.a/math.sqrt(self.a**2 + self.b**2))):.1f}°")
+            if abs(sin_B - 1) < 1e-10:
+                self.angle_B = 90.0
+            else:
+                self.angle_B = math.degrees(math.asin(sin_B))
+            self.angle_C = 180 - self.angle_A - self.angle_B
+            if self.angle_C <= 0:
+                raise ValueError(f"Invalid triangle: angle C = {self.angle_C:.1f}° ≤ 0")
+            # Find side c using law of sines
+            self.c = self.a * math.sin(math.radians(self.angle_C)) / math.sin(math.radians(self.angle_A))
+        elif angle_index == 1 and self.a is not None and self.b is not None:
+            # We have a, b, angle_B - find angle_A
+            sin_A = self.a * math.sin(math.radians(self.angle_B)) / self.b
+            if sin_A > 1:
+                raise ValueError("No valid triangle exists with these parameters")
+            self.angle_A = math.degrees(math.asin(sin_A))
+            self.angle_C = 180 - self.angle_A - self.angle_B
+            # Find side c using law of sines
+            self.c = self.a * math.sin(math.radians(self.angle_C)) / math.sin(math.radians(self.angle_A))
+        else:
+            raise ValueError("Unsupported combination for law of sines")
     
     def _solve_with_law_of_sines_two_sides(self, side_indices, angle_index):
         """Solve using law of sines when angle is not opposite to known sides."""
@@ -570,15 +612,33 @@ class CommonTriangle:
         
         if missing_side_index == 0:  # need side a
             b, c = sides[1], sides[2]
-            angle_A = angles[0] if angles[0] is not None else 180 - sum(a for a in angles[1:] if a is not None)
+            if angles[0] is not None:
+                angle_A = angles[0]
+            else:
+                known_angles = [a for a in angles[1:] if a is not None]
+                angle_A = 180 - sum(known_angles) if known_angles else None
+            if angle_A is None:
+                raise ValueError("Cannot determine angle A")
             self.a = math.sqrt(b**2 + c**2 - 2*b*c*math.cos(math.radians(angle_A)))
         elif missing_side_index == 1:  # need side b
             a, c = sides[0], sides[2]
-            angle_B = angles[1] if angles[1] is not None else 180 - sum(a for a in [angles[0], angles[2]] if a is not None)
+            if angles[1] is not None:
+                angle_B = angles[1]
+            else:
+                known_angles = [a for a in [angles[0], angles[2]] if a is not None]
+                angle_B = 180 - sum(known_angles) if known_angles else None
+            if angle_B is None:
+                raise ValueError("Cannot determine angle B")
             self.b = math.sqrt(a**2 + c**2 - 2*a*c*math.cos(math.radians(angle_B)))
         else:  # need side c
             a, b = sides[0], sides[1]
-            angle_C = angles[2] if angles[2] is not None else 180 - sum(a for a in angles[:2] if a is not None)
+            if angles[2] is not None:
+                angle_C = angles[2]
+            else:
+                known_angles = [a for a in angles[:2] if a is not None]
+                angle_C = 180 - sum(known_angles) if known_angles else None
+            if angle_C is None:
+                raise ValueError("Cannot determine angle C")
             self.c = math.sqrt(a**2 + b**2 - 2*a*b*math.cos(math.radians(angle_C)))
         
         self._calculate_remaining_angles()
