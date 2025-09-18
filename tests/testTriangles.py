@@ -512,6 +512,72 @@ class TestTriangleEdgeCases(unittest.TestCase):
         
         triangle = CommonTriangle(a=13, b=14, c=15)
         self.assertAlmostEqual(triangle.get_area(), 84.0, places=6)
+    
+    def test_height_calculations(self):
+        """Test height calculations for triangles."""
+        # Right triangle heights
+        triangle = RightTriangle(a=3, b=4)  # Area = 6
+        
+        # Height to hypotenuse should be (2 * area) / hypotenuse
+        expected_h_c = (2 * 6) / 5  # 12/5 = 2.4
+        self.assertAlmostEqual(triangle.get_height_to_side('c'), expected_h_c, places=6)
+        
+        # Height to side a should be (2 * area) / a
+        expected_h_a = (2 * 6) / 3  # 12/3 = 4
+        self.assertAlmostEqual(triangle.get_height_to_side('a'), expected_h_a, places=6)
+        
+        # Height to side b should be (2 * area) / b  
+        expected_h_b = (2 * 6) / 4  # 12/4 = 3
+        self.assertAlmostEqual(triangle.get_height_to_side('b'), expected_h_b, places=6)
+        
+        # Test all heights at once
+        heights = triangle.get_all_heights()
+        self.assertAlmostEqual(heights['h_a'], 4.0, places=6)
+        self.assertAlmostEqual(heights['h_b'], 3.0, places=6)
+        self.assertAlmostEqual(heights['h_c'], 2.4, places=6)
+        
+        # Common triangle heights
+        triangle = CommonTriangle(a=13, b=14, c=15)  # Area = 84
+        
+        expected_h_a = (2 * 84) / 13  # 168/13 ≈ 12.923
+        self.assertAlmostEqual(triangle.get_height_to_side('a'), expected_h_a, places=6)
+        
+        expected_h_b = (2 * 84) / 14  # 168/14 = 12
+        self.assertAlmostEqual(triangle.get_height_to_side('b'), expected_h_b, places=6)
+        
+        expected_h_c = (2 * 84) / 15  # 168/15 = 11.2
+        self.assertAlmostEqual(triangle.get_height_to_side('c'), expected_h_c, places=6)
+    
+    def test_height_validation(self):
+        """Test height calculation input validation."""
+        triangle = RightTriangle(a=3, b=4)
+        
+        # Valid sides
+        self.assertIsInstance(triangle.get_height_to_side('a'), float)
+        self.assertIsInstance(triangle.get_height_to_side('b'), float)
+        self.assertIsInstance(triangle.get_height_to_side('c'), float)
+        
+        # Invalid side
+        with self.assertRaises(ValueError):
+            triangle.get_height_to_side('d')
+        
+        with self.assertRaises(ValueError):
+            triangle.get_height_to_side('x')
+    
+    def test_area_consistency(self):
+        """Test that different area calculation methods are consistent."""
+        # For right triangle, both methods should give same result
+        triangle = RightTriangle(a=5, b=12)
+        area_direct = triangle.get_area()
+        area_heron = triangle.get_area_heron()
+        
+        self.assertAlmostEqual(area_direct, area_heron, places=10)
+        
+        # Verify area using height formula: Area = (1/2) * base * height
+        height_to_c = triangle.get_height_to_side('c')
+        area_from_height = 0.5 * triangle.c * height_to_c
+        
+        self.assertAlmostEqual(area_direct, area_from_height, places=10)
 
 
 class TestTriangleIntegration(unittest.TestCase):
@@ -541,6 +607,12 @@ class TestTriangleIntegration(unittest.TestCase):
             self.assertTrue(triangle.verify_mollweide())
             self.assertGreater(triangle.get_area(), 0)
             self.assertGreater(triangle.get_perimeter(), 0)
+            
+            # Test heights are positive
+            heights = triangle.get_all_heights()
+            self.assertGreater(heights['h_a'], 0)
+            self.assertGreater(heights['h_b'], 0)
+            self.assertGreater(heights['h_c'], 0)
 
 
 if __name__ == '__main__':

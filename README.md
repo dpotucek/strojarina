@@ -15,6 +15,7 @@ Comprehensive toolset for machining calculations with modern web interface. Incl
 - **Řemenice** - Pulley calculations and ratios
 - **Sinusová lišta** - Sine bar angle calculations
 - **Závitníkové vrtáky** - Tapping drill size calculations
+- **Trojúhelníky** - Right triangle calculations with Mollweide verification
 
 ### Command Line Tools
 - `deleni` - Division calculations
@@ -28,6 +29,7 @@ Comprehensive toolset for machining calculations with modern web interface. Incl
 - `sine-bar` - Sine bar calculations
 - `strojarina-ruzna` - Various calculations
 - `tapping-drills` - Tapping drill sizes
+- `triangles` - Right triangle calculations
 
 ## Quick Start
 
@@ -66,8 +68,13 @@ strojarina/
 │   ├── differentialThread.py # Differential threading
 │   ├── DivisionPlatePlain.py # Division plate calculations
 │   ├── findThread.py      # Thread database search
+│   ├── triangles.py       # Right triangle calculations
 │   ├── gui_deleni_web.py  # Web GUI Flask server
 │   └── templates/         # HTML templates for web GUI
+├── tests/                 # Unit tests
+│   ├── testDeleni.py      # Division head tests
+│   ├── testTriangles.py   # Triangle calculation tests
+│   └── ...                # Other test files
 ├── data/                  # Thread database files
 ├── wheels/                # DaPTools wheel distributions
 ├── Dockerfile             # Container definition
@@ -136,6 +143,13 @@ strojarina/
 - Input thread diameter, pitch, and strength percentage
 - Supports 60-85% thread engagement options
 
+### Right Triangle Calculator
+- Calculate missing parameters from various input combinations
+- Support for: two sides, side+angle, hypotenuse+side, hypotenuse+angle
+- Mollweide equation verification for mathematical accuracy
+- Comprehensive input validation and error handling
+- Area and perimeter calculations
+
 ## Docker Usage
 
 ### Using run script
@@ -181,9 +195,11 @@ python src/knurling.py
 
 # Run tests
 poetry run pytest tests/testDeleni.py -v
+python3 tests/testTriangles.py  # Right triangle tests
 
 # Python interactive
 python3 -c "from deleni import DeliciHlava; h = DeliciHlava(); print(h.vypocti_pocet_der(40))"
+python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print(t)"
 ```
 
 ### Docker Development
