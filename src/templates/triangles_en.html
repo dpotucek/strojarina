@@ -57,10 +57,8 @@
 
         <div id="right-triangle" class="tab-content active">
             <h2>Right Triangle</h2>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="/static/data/PravouhlyTrjuhelnik.png" alt="Right Triangle" style="max-width: 300px; height: auto; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-            <form id="right-triangle-form">
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                <form id="right-triangle-form" style="flex: 1;">
                 <div class="form-group">
                     <label for="precision">Precision:</label>
                     <select id="precision" name="precision">
@@ -97,17 +95,19 @@
                 </div>
 
                 <button type="submit">Calculate</button>
-            </form>
+                </form>
+                <div style="flex: 0 0 300px;">
+                    <img src="/static/data/PravouhlyTrjuhelnik.png" alt="Right Triangle" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+            </div>
 
             <div id="right-result" class="result"></div>
         </div>
 
         <div id="common-triangle" class="tab-content">
             <h2>General Triangle</h2>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="/static/data/ObecnyTrjuhelnik.png" alt="General Triangle" style="max-width: 300px; height: auto; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-            <form id="common-triangle-form">
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                <form id="common-triangle-form" style="flex: 1;">
                 <div class="form-group">
                     <label for="common-precision">Precision:</label>
                     <select id="common-precision" name="precision">
@@ -149,7 +149,11 @@
                 </div>
 
                 <button type="submit">Calculate</button>
-            </form>
+                </form>
+                <div style="flex: 0 0 300px;">
+                    <img src="/static/data/ObecnyTrjuhelnik.png" alt="General Triangle" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+            </div>
 
             <div id="common-result" class="result"></div>
         </div>
