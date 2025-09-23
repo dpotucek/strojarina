@@ -4,7 +4,7 @@
 Web GUI pro výpočty dělicí hlavy
 """
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from deleni import DeliciHlava
 from differentialThread import DifferentialThread
 from DivisionPlatePlain import calculate_disks_radius
@@ -43,6 +43,11 @@ def safe_int(value, param_name):
         raise ValueError(f"Invalid integer value for {param_name}: {value}")
 
 app = Flask(__name__)
+
+@app.route('/static/data/<path:filename>')
+def serve_data_files(filename):
+    """Serve files from data directory"""
+    return send_from_directory('../data', filename)
 
 @app.route('/')
 def index():
