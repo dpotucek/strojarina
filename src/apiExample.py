@@ -4,10 +4,10 @@ API Example - Demonstrace použití Strojarina REST API
 Ukázky volání všech dostupných API endpointů pro integraci s jinými programy
 
 Konfigurace:
-1. Spusťte Strojarina server: make web (nebo python src/gui_deleni_web.py)
+1. Spusť Strojarina server: make web (nebo python src/gui_deleni_web.py)
 2. Server běží na http://localhost:5000
-3. Nainstalujte requests: pip install requests
-4. Spusťte tento soubor: python src/apiExample.py
+3. Nainstaluj requests: pip install requests
+4. Spusť tento soubor: python src/apiExample.py
 
 Created by David Potucek on Sep 18, 2025
 Project: strojarina
@@ -265,7 +265,11 @@ def main():
     print("- POST /api/shaft-surfaces - Plochy na hřídeli")
     print("- POST /api/material-bending - Ohýbání materiálu")
     print("- POST /api/pulleys - Řemenice")
-    print("- POST /api/sine-bar - Sinusové pravítko")
+    print("- POST /api/find-thread - Hledání závitů")
+    print("- POST /api/division-plate - Dělicí kotouček")
+
+if __name__ == "__main__":
+    main()rint("- POST /api/sine-bar - Sinusové pravítko")
     print("- POST /api/tapping-drills - Závitníkové vrtáky")
     print("- POST /api/find-thread - Hledání závitů")
     print("- POST /api/division-plate - Dělicí kotouček")
