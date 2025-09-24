@@ -14,7 +14,12 @@ import os
 # Add src directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from triangles import RightTriangle, CommonTriangle
+# Import with explicit path for IDE compatibility
+try:
+    from src.triangles import RightTriangle, CommonTriangle
+except ImportError:
+    # Fallback for direct execution
+    from triangles import RightTriangle, CommonTriangle
 
 
 class TestRightTriangle(unittest.TestCase):

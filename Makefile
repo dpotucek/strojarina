@@ -14,7 +14,7 @@ run:
 test:
 	docker run --rm strojarina:latest python -m pytest tests/ || echo "No tests found"
 
-# Aktualizuje DaPTools a rebuild kontejner
+# Aktualizuje DaPTools a rebuilduje kontejner
 update-daptools:
 	@echo "Building DaPTools..."
 	cd ../DaPTools && poetry build
