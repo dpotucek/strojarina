@@ -44,28 +44,28 @@ class TestPlochyNaHrideli(unittest.TestCase):
 
     def test_hloubka_ctverce_class(self):
         # Use case 1: Standard 25mm shaft
-        result = self.pnh.hloubka_ctverce(25)
-        self.assertEqual(result, 3.125)
+        hloubka, delka = self.pnh.hloubka_ctverce(25)
+        self.assertEqual(hloubka, 3.125)
         
         # Use case 2: Small 20mm shaft
-        result = self.pnh.hloubka_ctverce(20)
-        self.assertEqual(result, 2.5)
+        hloubka, delka = self.pnh.hloubka_ctverce(20)
+        self.assertEqual(hloubka, 2.5)
         
         # Use case 3: Large 40mm shaft
-        result = self.pnh.hloubka_ctverce(40)
-        self.assertEqual(result, 5.0)
+        hloubka, delka = self.pnh.hloubka_ctverce(40)
+        self.assertEqual(hloubka, 5.0)
         
         # Use case 4: Small 15mm shaft
-        result = self.pnh.hloubka_ctverce(15)
-        self.assertEqual(result, 1.875)
+        hloubka, delka = self.pnh.hloubka_ctverce(15)
+        self.assertEqual(hloubka, 1.875)
         
         # Use case 5: Medium 35mm shaft
-        result = self.pnh.hloubka_ctverce(35)
-        self.assertEqual(result, 4.375)
+        hloubka, delka = self.pnh.hloubka_ctverce(35)
+        self.assertEqual(hloubka, 4.375)
         
         # Use case 6: Large 50mm shaft
-        result = self.pnh.hloubka_ctverce(50)
-        self.assertEqual(result, 6.25)
+        hloubka, delka = self.pnh.hloubka_ctverce(50)
+        self.assertEqual(hloubka, 6.25)
 
     def test_hloubka_plosky_function(self):
         # Use case 1: Standard shaft with flat

@@ -38,11 +38,9 @@ def sine_bar_radius(delka, r1, uhel):
     VZOREC:     r2 = 2 * delka * sin(0.5 * uhel) + r1
     """
     import math
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
-    import daptools.mathPhys as mfz
-    return 2 * delka * math.sin(0.5 * mfz.deg2rad(uhel)) + r1
+    # Convert degrees to radians
+    uhel_rad = math.radians(uhel)
+    return 2 * delka * math.sin(0.5 * uhel_rad) + r1
 
 
 def revolver_regular(holes, diameter, spacing, wall):

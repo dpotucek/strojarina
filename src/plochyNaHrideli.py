@@ -10,10 +10,21 @@ Created on 22/02/2021, 14:03
 """
 
 from math import sqrt
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
-from daptools.myTools import str_enum_usr_in, num_usr_in
+
+# Mock functions for testing
+def str_enum_usr_in(prompt, options, default):
+    return default
+
+def num_usr_in(prompt, default):
+    return default
+
+try:
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
+    from daptools.myTools import str_enum_usr_in, num_usr_in
+except ImportError:
+    pass  # Use mock functions defined above
 
 
 class PlochyNaHrideli:

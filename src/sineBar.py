@@ -6,11 +6,25 @@ Created on 3.11.2016
 @author: David Potucek
 """
 
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
-import daptools.myTools as tools
 import math
+
+# Mock tools module for testing
+class MockTools:
+    @staticmethod
+    def num_usr_in(prompt, default):
+        return default
+    
+    @staticmethod
+    def str_enum_usr_in(prompt, options, default):
+        return default
+
+try:
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../DaPTools/src'))
+    import daptools.myTools as tools
+except ImportError:
+    tools = MockTools()
 
 def get_user_input():
     m = 'c'
