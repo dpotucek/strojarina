@@ -235,10 +235,38 @@ python3 tests/testDeleni.py
 python3 tests/testTriangles.py -v
 ```
 
-#### PyCharm/IDE Setup
-1. **Mark src as Sources Root**: Right-click `src` folder → "Mark Directory as" → "Sources Root"
-2. **Configure Test Runner**: File → Settings → Tools → Python Integrated Tools → Set "Default test runner" to "Unittests"
-3. **Run Tests**: Right-click test file → "Run 'testTriangles'" (not pytest)
+#### IDE Setup
+
+##### PyCharm Setup
+1. **Open Project**: File → Open → Select `strojarina` folder
+2. **Mark Sources Root**: Right-click `src` folder → "Mark Directory as" → "Sources Root" (folder turns blue)
+3. **Configure Test Runner**: 
+   - File → Settings → Tools → Python Integrated Tools
+   - Set "Default test runner" to "Unittests" (not pytest)
+4. **Configure Python Interpreter**: File → Settings → Project → Python Interpreter → Select Python 3.9+
+5. **Run Tests**: Right-click test file → "Run 'testTriangles'" (not "Run pytest in testTriangles")
+6. **Debug Tests**: Right-click test file → "Debug 'testTriangles'"
+
+##### VS Code Setup
+1. **Open Project**: File → Open Folder → Select `strojarina` folder
+2. **Install Python Extension**: Extensions → Search "Python" → Install Microsoft Python extension
+3. **Configure Python Path**: 
+   - Ctrl+Shift+P → "Python: Select Interpreter" → Choose Python 3.9+
+   - Or create `.vscode/settings.json`:
+   ```json
+   {
+       "python.defaultInterpreterPath": "python3",
+       "python.testing.unittestEnabled": true,
+       "python.testing.pytestEnabled": false,
+       "python.testing.unittestArgs": ["-v", "-s", "./tests"],
+       "python.analysis.extraPaths": ["./src"]
+   }
+   ```
+4. **Run Tests**: 
+   - Test Explorer: View → Testing → Run tests
+   - Command Palette: Ctrl+Shift+P → "Python: Run All Tests"
+   - Individual: Click play button next to test methods
+5. **Debug Tests**: Click debug icon next to test methods in Test Explorer
 
 #### Docker Environment
 ```bash
@@ -253,7 +281,8 @@ docker run --rm strojarina:latest python3 tests/testTriangles.py
 - **No external dependencies** - Uses Python standard library only
 - **Self-contained** - All imports resolved automatically
 - **Cross-platform** - Works on Linux, macOS, Windows
-- **IDE Compatible** - Configured for PyCharm, VS Code, etc.
+- **IDE Compatible** - Pre-configured for PyCharm and VS Code
+- **Python 3.9+** - Compatible with modern Python versions
 
 ### Test Coverage
 - **Input validation** - Invalid parameters, edge cases
