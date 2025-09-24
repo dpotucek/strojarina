@@ -265,11 +265,7 @@ def main():
     print("- POST /api/shaft-surfaces - Plochy na hřídeli")
     print("- POST /api/material-bending - Ohýbání materiálu")
     print("- POST /api/pulleys - Řemenice")
-    print("- POST /api/find-thread - Hledání závitů")
-    print("- POST /api/division-plate - Dělicí kotouček")
-
-if __name__ == "__main__":
-    main()rint("- POST /api/sine-bar - Sinusové pravítko")
+    print("- POST /api/sine-bar - Sinusové pravítko")
     print("- POST /api/tapping-drills - Závitníkové vrtáky")
     print("- POST /api/find-thread - Hledání závitů")
     print("- POST /api/division-plate - Dělicí kotouček")
