@@ -203,6 +203,64 @@ docker-compose run --rm strojarina
 docker-compose run --rm strojarina-tests
 ```
 
+## Testing
+
+### Test Suite Overview
+**76 comprehensive unit tests** across 11 modules covering all machining calculations:
+
+- **testDeleni.py** (4 tests) - Division head calculations
+- **testDifferentialThread.py** (6 tests) - Differential threading
+- **testDivisionPlatePlain.py** (1 test) - Division plate calculations
+- **testFindThread.py** (7 tests) - Thread database search
+- **testKnurling.py** (2 tests) - Knurling calculations
+- **testPulleys.py** (2 tests) - Pulley calculations
+- **testTappingDrills.py** (6 tests) - Tapping drill sizes
+- **testTriangles.py** (40 tests) - Triangle calculations with Mollweide verification
+- **testStrojarinaRuzna.py** (3 tests) - Sine bar and revolver calculations
+- **testSineBar.py** (2 tests) - Sine bar cylinder calculations
+- **testPlochyNaHrideli.py** (4 tests) - Shaft surface calculations
+
+### Running Tests
+
+#### Command Line (Recommended)
+```bash
+# Run all tests
+for test in tests/test*.py; do python3 "$test"; done
+
+# Run specific test module
+python3 tests/testTriangles.py
+python3 tests/testDeleni.py
+
+# Run with verbose output
+python3 tests/testTriangles.py -v
+```
+
+#### PyCharm/IDE Setup
+1. **Mark src as Sources Root**: Right-click `src` folder → "Mark Directory as" → "Sources Root"
+2. **Configure Test Runner**: File → Settings → Tools → Python Integrated Tools → Set "Default test runner" to "Unittests"
+3. **Run Tests**: Right-click test file → "Run 'testTriangles'" (not pytest)
+
+#### Docker Environment
+```bash
+# Run tests in container
+make test
+
+# Or manually
+docker run --rm strojarina:latest python3 tests/testTriangles.py
+```
+
+### Test Requirements
+- **No external dependencies** - Uses Python standard library only
+- **Self-contained** - All imports resolved automatically
+- **Cross-platform** - Works on Linux, macOS, Windows
+- **IDE Compatible** - Configured for PyCharm, VS Code, etc.
+
+### Test Coverage
+- **Input validation** - Invalid parameters, edge cases
+- **Mathematical accuracy** - Precision verification, Mollweide equations
+- **Error handling** - Exception testing, boundary conditions
+- **Integration** - Module interactions, API compatibility
+
 ## Development
 
 ### Local Development
@@ -221,14 +279,11 @@ python src/deleni.py
 python src/differentialThread.py
 python src/knurling.py
 
-# Run tests
-poetry run pytest tests/testDeleni.py -v
-python3 tests/testTriangles.py  # Right triangle tests
-
-# Python interactive
+# Python interactive examples
 python3 -c "from deleni import DeliciHlava; h = DeliciHlava(); print(h.vypocti_pocet_der(40))"
 python3 -c "from triangles import RightTriangle; t = RightTriangle(a=3, b=4); print(t)"
 python3 -c "from triangles import CommonTriangle; t = CommonTriangle(a=3, b=4, c=5); print(t)"
+
 # Complete triangle analysis
 python3 -c "from triangles import RightTriangle; t = RightTriangle(precision='1sec', a=3, b=4); print('Complete geometry:', t.get_circles_and_geometry())"
 
