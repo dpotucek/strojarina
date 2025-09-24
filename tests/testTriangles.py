@@ -11,15 +11,17 @@ import math
 import sys
 import os
 
-# Add src directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# Get absolute path to src directory
+test_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(test_dir)
+src_dir = os.path.join(project_root, 'src')
 
-# Import with explicit path for IDE compatibility
-try:
-    from src.triangles import RightTriangle, CommonTriangle
-except ImportError:
-    # Fallback for direct execution
-    from triangles import RightTriangle, CommonTriangle
+# Add src directory to Python path
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
+
+# Import triangles module
+from triangles import RightTriangle, CommonTriangle
 
 
 class TestRightTriangle(unittest.TestCase):
