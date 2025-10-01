@@ -38,27 +38,41 @@ class PrecisionSettings:
         return round(value, digits - int(math.floor(math.log10(abs(value)))) - 1)
 
 
-class RightTriangle:
-    """Class for right triangle calculations with Mollweide equation verification."""
+def verify_mollweide(a, b, c, angle_A, angle_B, angle_C, tolerance=1e-6):
+    """Standalone Mollweide equation verification.
     
-    def __init__(self, precision=None, **kwargs):
-        """Initialize triangle with various parameter combinations.
-        
-        Supported combinations:
-        - sides: a, b (calculates c and angles)
-        - side_angle: a, angle_A or b, angle_B
-        - hypotenuse_side: c, a or c, b
-        - hypotenuse_angle: c, angle_A or c, angle_B
-        """
+    Mollweide's formula: (a - b) / c = sin((A - B)/2) / cos(C/2)
+    
+    Args:
+        a, b, c: Triangle sides
+        angle_A, angle_B, angle_C: Triangle angles in degrees
+        tolerance: Numerical tolerance for verification
+    
+    Returns:
+        True if triangle satisfies the equation within tolerance.
+    """
+    try:
+        left_side = (a - b) / c
+        angle_diff = math.radians(angle_A - angle_B)
+        angle_C_half = math.radians(angle_C / 2)
+        right_side = math.sin(angle_diff / 2) / math.cos(angle_C_half)
+        return abs(left_side - right_side) < tolerance
+    except (TypeError, ValueError, ZeroDivisionError):
+        return False
+
+
+class BaseTriangle:
+    """Base class for triangle calculations with common functionality."""
+    
+    def __init__(self, precision=None):
+        """Initialize base triangle."""
         self.a = None  # side opposite to angle A
         self.b = None  # side opposite to angle B  
-        self.c = None  # hypotenuse
+        self.c = None  # side opposite to angle C
         self.angle_A = None  # angle opposite to side a (degrees)
         self.angle_B = None  # angle opposite to side b (degrees)
-        self.angle_C = 90.0  # right angle
+        self.angle_C = None  # angle opposite to side c (degrees)
         self.precision = precision  # angular precision setting
-        
-        self._validate_and_calculate(**kwargs)
     
     def _validate_input(self, value, name, min_val=0, max_val=None):
         """Validate numeric input parameters."""
@@ -76,6 +90,119 @@ class RightTriangle:
             return val
         except (TypeError, ValueError) as e:
             raise ValueError(f"Invalid {name}: {e}")
+    
+    def verify_mollweide(self, tolerance=1e-6):
+        """Verify triangle using Mollweide's equation."""
+        return verify_mollweide(self.a, self.b, self.c, 
+                               self.angle_A, self.angle_B, self.angle_C, tolerance)
+    
+    def get_area(self):
+        """Calculate triangle area using Heron's formula."""
+        s = (self.a + self.b + self.c) / 2
+        return math.sqrt(s * (s - self.a) * (s - self.b) * (s - self.c))
+    
+    def get_perimeter(self):
+        """Calculate triangle perimeter."""
+        return self.a + self.b + self.c
+    
+    def get_height_to_side(self, side):
+        """Calculate height to specified side."""
+        area = self.get_area()
+        if side == 'a':
+            return PrecisionSettings.round_value((2 * area) / self.a, self.precision)
+        elif side == 'b':
+            return PrecisionSettings.round_value((2 * area) / self.b, self.precision)
+        elif side == 'c':
+            return PrecisionSettings.round_value((2 * area) / self.c, self.precision)
+        else:
+            raise ValueError("Side must be 'a', 'b', or 'c'")
+    
+    def get_all_heights(self):
+        """Get heights to all three sides."""
+        area = self.get_area()
+        return {
+            'h_a': PrecisionSettings.round_value((2 * area) / self.a, self.precision),
+            'h_b': PrecisionSettings.round_value((2 * area) / self.b, self.precision),
+            'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
+        }
+    
+    def get_inradius(self):
+        """Calculate inradius (radius of inscribed circle)."""
+        area = self.get_area()
+        semiperimeter = self.get_perimeter() / 2
+        return PrecisionSettings.round_value(area / semiperimeter, self.precision)
+    
+    def get_circumradius(self):
+        """Calculate circumradius (radius of circumscribed circle)."""
+        area = self.get_area()
+        return PrecisionSettings.round_value((self.a * self.b * self.c) / (4 * area), self.precision)
+    
+    def get_medians(self):
+        """Calculate medians to all three sides."""
+        ma = 0.5 * math.sqrt(2 * self.b**2 + 2 * self.c**2 - self.a**2)
+        mb = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.c**2 - self.b**2)
+        mc = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.b**2 - self.c**2)
+        
+        return {
+            'm_a': PrecisionSettings.round_value(ma, self.precision),
+            'm_b': PrecisionSettings.round_value(mb, self.precision),
+            'm_c': PrecisionSettings.round_value(mc, self.precision)
+        }
+    
+    def get_centroid_from_vertices(self, A=(0, 0), B=None, C=None):
+        """Calculate centroid coordinates from vertex coordinates."""
+        if B is None:
+            B = (self.c, 0)
+        if C is None:
+            angle_A_rad = math.radians(self.angle_A)
+            C = (self.b * math.cos(angle_A_rad), self.b * math.sin(angle_A_rad))
+        
+        centroid_x = (A[0] + B[0] + C[0]) / 3
+        centroid_y = (A[1] + B[1] + C[1]) / 3
+        
+        return (
+            PrecisionSettings.round_value(centroid_x, self.precision),
+            PrecisionSettings.round_value(centroid_y, self.precision)
+        )
+    
+    def get_circles_and_geometry(self):
+        """Get all circle and geometric properties."""
+        return {
+            'inradius': self.get_inradius(),
+            'circumradius': self.get_circumradius(),
+            'medians': self.get_medians(),
+            'centroid': self.get_centroid_from_vertices()
+        }
+    
+    def get_rounded_values(self):
+        """Get all triangle values rounded to current precision."""
+        return {
+            'a': PrecisionSettings.round_value(self.a, self.precision),
+            'b': PrecisionSettings.round_value(self.b, self.precision),
+            'c': PrecisionSettings.round_value(self.c, self.precision),
+            'angle_A': PrecisionSettings.round_value(self.angle_A, self.precision),
+            'angle_B': PrecisionSettings.round_value(self.angle_B, self.precision),
+            'angle_C': PrecisionSettings.round_value(self.angle_C, self.precision),
+            'area': PrecisionSettings.round_value(self.get_area(), self.precision),
+            'perimeter': PrecisionSettings.round_value(self.get_perimeter(), self.precision)
+        }
+
+
+class RightTriangle(BaseTriangle):
+    """Class for right triangle calculations with Mollweide equation verification."""
+    
+    def __init__(self, precision=None, **kwargs):
+        """Initialize triangle with various parameter combinations.
+        
+        Supported combinations:
+        - sides: a, b (calculates c and angles)
+        - side_angle: a, angle_A or b, angle_B
+        - hypotenuse_side: c, a or c, b
+        - hypotenuse_angle: c, angle_A or c, angle_B
+        """
+        super().__init__(precision)
+        self.angle_C = 90.0  # right angle
+        self._validate_and_calculate(**kwargs)
     
     def _validate_and_calculate(self, **kwargs):
         """Validate inputs and calculate missing parameters."""
@@ -220,111 +347,21 @@ class RightTriangle:
             self.a = c * math.sin(angle_rad)
             self.b = c * math.cos(angle_rad)
     
-    def verify_mollweide(self, tolerance=1e-6):
-        """Verify triangle using Mollweide's equation.
-        
-        Mollweide's formula: (a - b) / c = sin((A - B)/2) / cos(C/2)
-        For right triangle where C = 90°: cos(C/2) = cos(45°) = √2/2
-        
-        Returns True if triangle satisfies the equation within tolerance.
-        """
-        try:
-            # Mollweide equation: (a - b) / c = sin((A - B)/2) / cos(C/2)
-            left_side = (self.a - self.b) / self.c
-            
-            angle_diff = math.radians(self.angle_A - self.angle_B)
-            right_side = math.sin(angle_diff / 2) / math.cos(math.radians(45))
-            
-            return abs(left_side - right_side) < tolerance
-        except (TypeError, ValueError, ZeroDivisionError):
-            return False
-    
     def get_area(self):
-        """Calculate triangle area."""
+        """Calculate triangle area (optimized for right triangle)."""
         return (self.a * self.b) / 2
     
     def get_area_heron(self):
         """Calculate area using Heron's formula for verification."""
-        s = (self.a + self.b + self.c) / 2
-        return math.sqrt(s * (s - self.a) * (s - self.b) * (s - self.c))
-    
-    def get_perimeter(self):
-        """Calculate triangle perimeter."""
-        return self.a + self.b + self.c
-    
-    def get_height_to_side(self, side):
-        """Calculate height to specified side.
-        
-        Args:
-            side: 'a', 'b', or 'c' - the side to calculate height to
-        
-        Returns:
-            Height to the specified side
-        """
-        area = self.get_area()
-        if side == 'a':
-            return PrecisionSettings.round_value((2 * area) / self.a, self.precision)
-        elif side == 'b':
-            return PrecisionSettings.round_value((2 * area) / self.b, self.precision)
-        elif side == 'c':
-            return PrecisionSettings.round_value((2 * area) / self.c, self.precision)
-        else:
-            raise ValueError("Side must be 'a', 'b', or 'c'")
-    
-    def get_all_heights(self):
-        """Get heights to all three sides.
-        
-        Returns:
-            Dictionary with heights to sides a, b, and c
-        """
-        area = self.get_area()
-        return {
-            'h_a': PrecisionSettings.round_value((2 * area) / self.a, self.precision),
-            'h_b': PrecisionSettings.round_value((2 * area) / self.b, self.precision),
-            'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
-        }
-    
-    def get_inradius(self):
-        """Calculate inradius (radius of inscribed circle)."""
-        area = self.get_area()
-        semiperimeter = self.get_perimeter() / 2
-        return PrecisionSettings.round_value(area / semiperimeter, self.precision)
-    
-    def get_circumradius(self):
-        """Calculate circumradius (radius of circumscribed circle)."""
-        area = self.get_area()
-        return PrecisionSettings.round_value((self.a * self.b * self.c) / (4 * area), self.precision)
-    
-    def get_medians(self):
-        """Calculate medians to all three sides."""
-        # Median formulas: ma = 0.5 * sqrt(2*b² + 2*c² - a²)
-        ma = 0.5 * math.sqrt(2 * self.b**2 + 2 * self.c**2 - self.a**2)
-        mb = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.c**2 - self.b**2)
-        mc = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.b**2 - self.c**2)
-        
-        return {
-            'm_a': PrecisionSettings.round_value(ma, self.precision),
-            'm_b': PrecisionSettings.round_value(mb, self.precision),
-            'm_c': PrecisionSettings.round_value(mc, self.precision)
-        }
+        return super().get_area()
     
     def get_centroid_from_vertices(self, A=(0, 0), B=None, C=None):
-        """Calculate centroid coordinates from vertex coordinates.
-        
-        Args:
-            A: Vertex A coordinates (default: origin)
-            B: Vertex B coordinates (calculated if None)
-            C: Vertex C coordinates (calculated if None)
-        
-        Returns:
-            Centroid coordinates (x, y)
-        """
+        """Calculate centroid coordinates for right triangle."""
         if B is None:
             B = (self.b, 0)  # Place B on x-axis
         if C is None:
             C = (0, self.a)  # Place C on y-axis for right triangle
         
-        # Centroid is average of vertices
         centroid_x = (A[0] + B[0] + C[0]) / 3
         centroid_y = (A[1] + B[1] + C[1]) / 3
         
@@ -332,28 +369,6 @@ class RightTriangle:
             PrecisionSettings.round_value(centroid_x, self.precision),
             PrecisionSettings.round_value(centroid_y, self.precision)
         )
-    
-    def get_circles_and_geometry(self):
-        """Get all circle and geometric properties."""
-        return {
-            'inradius': self.get_inradius(),
-            'circumradius': self.get_circumradius(),
-            'medians': self.get_medians(),
-            'centroid': self.get_centroid_from_vertices()
-        }
-    
-    def get_rounded_values(self):
-        """Get all triangle values rounded to current precision."""
-        return {
-            'a': PrecisionSettings.round_value(self.a, self.precision),
-            'b': PrecisionSettings.round_value(self.b, self.precision),
-            'c': PrecisionSettings.round_value(self.c, self.precision),
-            'angle_A': PrecisionSettings.round_value(self.angle_A, self.precision),
-            'angle_B': PrecisionSettings.round_value(self.angle_B, self.precision),
-            'angle_C': 90.0,
-            'area': PrecisionSettings.round_value(self.get_area(), self.precision),
-            'perimeter': PrecisionSettings.round_value(self.get_perimeter(), self.precision)
-        }
     
     def __str__(self):
         digits = PrecisionSettings.get_digits(self.precision)
@@ -369,7 +384,7 @@ class RightTriangle:
         return f"RightTriangle(a={self.a}, b={self.b}, c={self.c})"
 
 
-class CommonTriangle:
+class CommonTriangle(BaseTriangle):
     """Class for general triangle calculations with law of sines/cosines and Mollweide verification."""
     
     def __init__(self, precision=None, **kwargs):
@@ -380,32 +395,8 @@ class CommonTriangle:
         - two_sides_angle: a, b, angle_C (or other combinations)
         - side_two_angles: a, angle_B, angle_C (or other combinations)
         """
-        self.a = None  # side opposite to angle A
-        self.b = None  # side opposite to angle B  
-        self.c = None  # side opposite to angle C
-        self.angle_A = None  # angle opposite to side a (degrees)
-        self.angle_B = None  # angle opposite to side b (degrees)
-        self.angle_C = None  # angle opposite to side c (degrees)
-        self.precision = precision  # angular precision setting
-        
+        super().__init__(precision)
         self._validate_and_calculate(**kwargs)
-    
-    def _validate_input(self, value, name, min_val=0, max_val=None):
-        """Validate numeric input parameters."""
-        if value is None:
-            return None
-        
-        try:
-            val = float(value)
-            if math.isnan(val) or math.isinf(val):
-                raise ValueError(f"{name} cannot be NaN or infinite")
-            if val <= min_val:
-                raise ValueError(f"{name} must be greater than {min_val}")
-            if max_val and val >= max_val:
-                raise ValueError(f"{name} must be less than {max_val}")
-            return val
-        except (TypeError, ValueError) as e:
-            raise ValueError(f"Invalid {name}: {e}")
     
     def _validate_and_calculate(self, **kwargs):
         """Validate inputs and calculate missing parameters."""
@@ -659,141 +650,6 @@ class CommonTriangle:
             cos_C = (self.a**2 + self.b**2 - self.c**2) / (2 * self.a * self.b)
             cos_C = max(-1, min(1, cos_C))
             self.angle_C = math.degrees(math.acos(cos_C))
-    
-    def verify_mollweide(self, tolerance=1e-6):
-        """Verify triangle using Mollweide's equation.
-        
-        Mollweide's formula: (a - b) / c = sin((A - B)/2) / cos(C/2)
-        
-        Returns True if triangle satisfies the equation within tolerance.
-        """
-        try:
-            # Mollweide equation: (a - b) / c = sin((A - B)/2) / cos(C/2)
-            left_side = (self.a - self.b) / self.c
-            
-            angle_diff = math.radians(self.angle_A - self.angle_B)
-            angle_C_half = math.radians(self.angle_C / 2)
-            right_side = math.sin(angle_diff / 2) / math.cos(angle_C_half)
-            
-            return abs(left_side - right_side) < tolerance
-        except (TypeError, ValueError, ZeroDivisionError):
-            return False
-    
-    def get_area(self):
-        """Calculate triangle area using Heron's formula."""
-        s = (self.a + self.b + self.c) / 2  # semi-perimeter
-        return math.sqrt(s * (s - self.a) * (s - self.b) * (s - self.c))
-    
-    def get_perimeter(self):
-        """Calculate triangle perimeter."""
-        return self.a + self.b + self.c
-    
-    def get_height_to_side(self, side):
-        """Calculate height to specified side.
-        
-        Args:
-            side: 'a', 'b', or 'c' - the side to calculate height to
-        
-        Returns:
-            Height to the specified side
-        """
-        area = self.get_area()
-        if side == 'a':
-            return PrecisionSettings.round_value((2 * area) / self.a, self.precision)
-        elif side == 'b':
-            return PrecisionSettings.round_value((2 * area) / self.b, self.precision)
-        elif side == 'c':
-            return PrecisionSettings.round_value((2 * area) / self.c, self.precision)
-        else:
-            raise ValueError("Side must be 'a', 'b', or 'c'")
-    
-    def get_all_heights(self):
-        """Get heights to all three sides.
-        
-        Returns:
-            Dictionary with heights to sides a, b, and c
-        """
-        area = self.get_area()
-        return {
-            'h_a': PrecisionSettings.round_value((2 * area) / self.a, self.precision),
-            'h_b': PrecisionSettings.round_value((2 * area) / self.b, self.precision),
-            'h_c': PrecisionSettings.round_value((2 * area) / self.c, self.precision)
-        }
-    
-    def get_inradius(self):
-        """Calculate inradius (radius of inscribed circle)."""
-        area = self.get_area()
-        semiperimeter = self.get_perimeter() / 2
-        return PrecisionSettings.round_value(area / semiperimeter, self.precision)
-    
-    def get_circumradius(self):
-        """Calculate circumradius (radius of circumscribed circle)."""
-        area = self.get_area()
-        return PrecisionSettings.round_value((self.a * self.b * self.c) / (4 * area), self.precision)
-    
-    def get_medians(self):
-        """Calculate medians to all three sides."""
-        # Median formulas: ma = 0.5 * sqrt(2*b² + 2*c² - a²)
-        ma = 0.5 * math.sqrt(2 * self.b**2 + 2 * self.c**2 - self.a**2)
-        mb = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.c**2 - self.b**2)
-        mc = 0.5 * math.sqrt(2 * self.a**2 + 2 * self.b**2 - self.c**2)
-        
-        return {
-            'm_a': PrecisionSettings.round_value(ma, self.precision),
-            'm_b': PrecisionSettings.round_value(mb, self.precision),
-            'm_c': PrecisionSettings.round_value(mc, self.precision)
-        }
-    
-    def get_centroid_from_vertices(self, A=(0, 0), B=None, C=None):
-        """Calculate centroid coordinates from vertex coordinates.
-        
-        Args:
-            A: Vertex A coordinates (default: origin)
-            B: Vertex B coordinates (calculated if None)
-            C: Vertex C coordinates (calculated if None)
-        
-        Returns:
-            Centroid coordinates (x, y)
-        """
-        if B is None:
-            # Place B at distance c from A
-            B = (self.c, 0)
-        if C is None:
-            # Calculate C position using law of cosines
-            # C is at distance b from A and distance a from B
-            angle_A_rad = math.radians(self.angle_A)
-            C = (self.b * math.cos(angle_A_rad), self.b * math.sin(angle_A_rad))
-        
-        # Centroid is average of vertices
-        centroid_x = (A[0] + B[0] + C[0]) / 3
-        centroid_y = (A[1] + B[1] + C[1]) / 3
-        
-        return (
-            PrecisionSettings.round_value(centroid_x, self.precision),
-            PrecisionSettings.round_value(centroid_y, self.precision)
-        )
-    
-    def get_circles_and_geometry(self):
-        """Get all circle and geometric properties."""
-        return {
-            'inradius': self.get_inradius(),
-            'circumradius': self.get_circumradius(),
-            'medians': self.get_medians(),
-            'centroid': self.get_centroid_from_vertices()
-        }
-    
-    def get_rounded_values(self):
-        """Get all triangle values rounded to current precision."""
-        return {
-            'a': PrecisionSettings.round_value(self.a, self.precision),
-            'b': PrecisionSettings.round_value(self.b, self.precision),
-            'c': PrecisionSettings.round_value(self.c, self.precision),
-            'angle_A': PrecisionSettings.round_value(self.angle_A, self.precision),
-            'angle_B': PrecisionSettings.round_value(self.angle_B, self.precision),
-            'angle_C': PrecisionSettings.round_value(self.angle_C, self.precision),
-            'area': PrecisionSettings.round_value(self.get_area(), self.precision),
-            'perimeter': PrecisionSettings.round_value(self.get_perimeter(), self.precision)
-        }
     
     def is_right_triangle(self, tolerance=1e-6):
         """Check if triangle is a right triangle."""
