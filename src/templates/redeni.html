@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ředění roztoků - Strojarina</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: url('/static/data/staraDilna.png') center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 700px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .lang-switcher { text-align: right; margin-bottom: 20px; }
+        .lang-switcher a { margin: 0 5px; color: #007bff; text-decoration: none; }
+        .lang-switcher a.active { font-weight: bold; color: #333; }
+        h1 { text-align: center; color: #333; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #dee2e6; }
+        .tab { padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 16px; color: #666; }
+        .tab.active { color: #007bff; border-bottom: 3px solid #007bff; margin-bottom: -2px; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 20px; background: #e7f3ff; border-left: 4px solid #007bff; border-radius: 4px; }
+        .result h3 { margin-top: 0; color: #007bff; }
+        .result-item { margin: 10px 0; padding: 8px; background: white; border-radius: 4px; }
+        .result-label { font-weight: bold; color: #555; }
+        .result-value { color: #333; float: right; }
+        .error { background: #f8d7da; border-left-color: #dc3545; color: #721c24; }
+        .info-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .info-box h4 { margin-top: 0; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switcher">
+            <a href="/redeni" class="active">CZ</a> | <a href="/en/solution-dilution">EN</a>
+        </div>
+        <a href="/" class="back-link">← Zpět na hlavní stránku</a>
+        <h1>Ředění roztoků</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dilution')">Ředění (Dilution)</button>
+            <button class="tab" onclick="switchTab('mixing')">Smíchávání (Mixing)</button>
+        </div>
+        
+        <!-- Dilution Tab -->
+        <div id="dilution" class="tab-content active">
+            <div class="info-box">
+                <h4>Ředění - Přidání vody k existujícímu alkoholu</h4>
+                <p>Máte určitý objem alkoholu a chcete ho zředit na nižší koncentraci přidáním vody.</p>
+            </div>
+            
+            <form id="dilutionForm" onsubmit="calculateDilution(event)">
+                <div class="form-group">
+                    <label for="v_start">Počáteční objem alkoholu (litry):</label>
+                    <input type="number" id="v_start" step="0.001" min="0.001" required placeholder="např. 1.0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="c_poc_dil">Počáteční koncentrace (%):</label>
+                    <input type="number" id="c_poc_dil" step="0.1" min="0.1" max="100" required placeholder="např. 74">
+                </div>
+                
+                <div class="form-group">
+                    <label for="c_cil_dil">Cílová koncentrace (%):</label>
+                    <input type="number" id="c_cil_dil" step="0.1" min="0.1" max="100" required placeholder="např. 40">
+                </div>
+                
+                <button type="submit">Vypočítat</button>
+            </form>
+            
+            <div id="dilutionResult"></div>
+        </div>
+        
+        <!-- Mixing Tab -->
+        <div id="mixing" class="tab-content">
+            <div class="info-box">
+                <h4>Smíchávání - Příprava roztoku z alkoholu a vody</h4>
+                <p>Chcete připravit určitý objem roztoku s požadovanou koncentrací smícháním alkoholu a vody.</p>
+            </div>
+            
+            <form id="mixingForm" onsubmit="calculateMixing(event)">
+                <div class="form-group">
+                    <label for="v_cil">Požadovaný celkový objem (litry):</label>
+                    <input type="number" id="v_cil" step="0.001" min="0.001" required placeholder="např. 10.0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="c_poc_mix">Koncentrace dostupného alkoholu (%):</label>
+                    <input type="number" id="c_poc_mix" step="0.1" min="0.1" max="100" required placeholder="např. 74">
+                </div>
+                
+                <div class="form-group">
+                    <label for="c_cil_mix">Požadovaná cílová koncentrace (%):</label>
+                    <input type="number" id="c_cil_mix" step="0.1" min="0.1" max="100" required placeholder="např. 40">
+                </div>
+                
+                <button type="submit">Vypočítat</button>
+            </form>
+            
+            <div id="mixingResult"></div>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Clear results
+            document.getElementById('dilutionResult').innerHTML = '';
+            document.getElementById('mixingResult').innerHTML = '';
+        }
+        
+        async function calculateDilution(event) {
+            event.preventDefault();
+            
+            const data = {
+                v_start: parseFloat(document.getElementById('v_start').value),
+                c_poc: parseFloat(document.getElementById('c_poc_dil').value),
+                c_cil: parseFloat(document.getElementById('c_cil_dil').value)
+            };
+            
+            try {
+                const response = await fetch('/api/redeni/dilution', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                displayDilutionResult(result);
+            } catch (error) {
+                displayError('dilutionResult', 'Chyba při výpočtu: ' + error.message);
+            }
+        }
+        
+        async function calculateMixing(event) {
+            event.preventDefault();
+            
+            const data = {
+                v_cil: parseFloat(document.getElementById('v_cil').value),
+                c_poc: parseFloat(document.getElementById('c_poc_mix').value),
+                c_cil: parseFloat(document.getElementById('c_cil_mix').value)
+            };
+            
+            try {
+                const response = await fetch('/api/redeni/mixing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                displayMixingResult(result);
+            } catch (error) {
+                displayError('mixingResult', 'Chyba při výpočtu: ' + error.message);
+            }
+        }
+        
+        function displayDilutionResult(result) {
+            const resultDiv = document.getElementById('dilutionResult');
+            
+            if (!result.success) {
+                displayError('dilutionResult', result.error);
+                return;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h3>Výsledek: Ředění</h3>
+                    <div class="result-item">
+                        <span class="result-label">Původní objem alkoholu:</span>
+                        <span class="result-value">${result.v_start} l</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Počáteční koncentrace:</span>
+                        <span class="result-value">${result.c_poc} %</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Cílová koncentrace:</span>
+                        <span class="result-value">${result.c_cil} %</span>
+                    </div>
+                    <div class="result-item" style="background: #d4edda; font-weight: bold;">
+                        <span class="result-label">Potřebné množství vody:</span>
+                        <span class="result-value">${result.v_voda} l (${result.v_voda_ml} ml)</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Celkový konečný objem:</span>
+                        <span class="result-value">${result.v_final} l</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayMixingResult(result) {
+            const resultDiv = document.getElementById('mixingResult');
+            
+            if (!result.success) {
+                displayError('mixingResult', result.error);
+                return;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h3>Výsledek: Smíchávání</h3>
+                    <div class="result-item">
+                        <span class="result-label">Cílový celkový objem:</span>
+                        <span class="result-value">${result.v_cil} l</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Cílová koncentrace:</span>
+                        <span class="result-value">${result.c_cil} %</span>
+                    </div>
+                    <div class="result-item" style="background: #d4edda; font-weight: bold;">
+                        <span class="result-label">Alkohol (${result.c_poc}%):</span>
+                        <span class="result-value">${result.v_alkohol} l (${result.v_alkohol_ml} ml)</span>
+                    </div>
+                    <div class="result-item" style="background: #d4edda; font-weight: bold;">
+                        <span class="result-label">Voda (0%):</span>
+                        <span class="result-value">${result.v_voda} l (${result.v_voda_ml} ml)</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Ověření celkového objemu:</span>
+                        <span class="result-value">${(result.v_alkohol + result.v_voda).toFixed(4)} l</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayError(elementId, message) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.innerHTML = `
+                <div class="result error">
+                    <h3>Chyba</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

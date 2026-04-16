@@ -15,6 +15,7 @@ from pulleys import calculate2_pulleys, find_driven_diameter
 from sineBar import calculate_link_sine_bar, calculate_contact_sine_bar
 from tappingDrills import MetricThread
 from triangles import RightTriangle, CommonTriangle, PrecisionSettings
+from daptools.redeni import dilution, mixing
 import math
 
 # Thread pitch constants for performance
@@ -144,6 +145,14 @@ def triangles():
 @app.route('/en/triangles')
 def triangles_en():
     return render_template('triangles_en.html')
+
+@app.route('/redeni')
+def redeni():
+    return render_template('redeni.html')
+
+@app.route('/en/solution-dilution')
+def solution_dilution_en():
+    return render_template('redeni_en.html')
 
 @app.route('/api/pocty', methods=['POST'])
 def vypocitat_pocty():
@@ -588,6 +597,64 @@ def calculate_common_triangle():
                 'isosceles': triangle.is_isosceles(),
                 'equilateral': triangle.is_equilateral()
             }
+        }
+    except Exception as e:
+        result = {
+            'success': False,
+            'error': str(e)
+        }
+    
+    return jsonify(result)
+
+@app.route('/api/redeni/dilution', methods=['POST'])
+def calculate_dilution():
+    data = request.json
+    
+    try:
+        v_start = safe_float(data.get('v_start'), 'v_start')
+        c_poc = safe_float(data.get('c_poc'), 'c_poc')
+        c_cil = safe_float(data.get('c_cil'), 'c_cil')
+        
+        v_voda = dilution(v_start, c_poc, c_cil)
+        v_final = v_start + v_voda
+        
+        result = {
+            'success': True,
+            'v_start': v_start,
+            'c_poc': c_poc,
+            'c_cil': c_cil,
+            'v_voda': round(v_voda, 4),
+            'v_voda_ml': round(v_voda * 1000, 1),
+            'v_final': round(v_final, 4)
+        }
+    except Exception as e:
+        result = {
+            'success': False,
+            'error': str(e)
+        }
+    
+    return jsonify(result)
+
+@app.route('/api/redeni/mixing', methods=['POST'])
+def calculate_mixing():
+    data = request.json
+    
+    try:
+        v_cil = safe_float(data.get('v_cil'), 'v_cil')
+        c_poc = safe_float(data.get('c_poc'), 'c_poc')
+        c_cil = safe_float(data.get('c_cil'), 'c_cil')
+        
+        v_alkohol, v_voda = mixing(v_cil, c_poc, c_cil)
+        
+        result = {
+            'success': True,
+            'v_cil': v_cil,
+            'c_poc': c_poc,
+            'c_cil': c_cil,
+            'v_alkohol': round(v_alkohol, 4),
+            'v_alkohol_ml': round(v_alkohol * 1000, 1),
+            'v_voda': round(v_voda, 4),
+            'v_voda_ml': round(v_voda * 1000, 1)
         }
     except Exception as e:
         result = {
