@@ -13,6 +13,8 @@ poetry build
 # Copy to strojarina
 echo "Copying wheel to strojarina..."
 cd ../strojarina
+# Remove old wheels to avoid conflicts
+rm -f wheels/daptools-*.whl
 cp ../DaPTools/dist/*.whl wheels/
 
 # Rebuild container

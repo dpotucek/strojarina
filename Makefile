@@ -18,15 +18,17 @@ test:
 update-daptools:
 	@echo "Building DaPTools..."
 	cd ../DaPTools && poetry build
-	@echo "Copying wheel to strojarina..."
-	cp ../DaPTools/dist/*.whl wheels/
+	@echo "Copying latest wheel to strojarina..."
+	rm -f wheels/daptools-*.whl
+	cp $$(ls -t ../DaPTools/dist/daptools-*.whl | sort -V | tail -1) wheels/
 	@echo "Rebuilding container..."
 	docker build -t strojarina:latest . --no-cache
 
 # Pouze build DaPTools wheel
 build-deps:
 	cd ../DaPTools && poetry build
-	cp ../DaPTools/dist/*.whl wheels/
+	rm -f wheels/daptools-*.whl
+	cp $$(ls -t ../DaPTools/dist/daptools-*.whl | sort -V | tail -1) wheels/
 
 # Development s hot reload
 dev: update-daptools

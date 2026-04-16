@@ -9,9 +9,9 @@ RUN apt-get update && apt-get install -y \
 # Install Poetry
 RUN pip install poetry
 
-# Install DaPTools from wheel
+# Install DaPTools from wheel (only latest version)
 COPY wheels/*.whl /tmp/
-RUN pip install /tmp/*.whl
+RUN pip install $(ls /tmp/daptools-*.whl | sort -V | tail -1)
 
 # Copy poetry files
 COPY pyproject.toml poetry.lock ./
