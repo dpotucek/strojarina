@@ -57,22 +57,22 @@
             <h3>Calculate driven pulley RPM and belt length</h3>
             <div class="form-group">
                 <label>Driver pulley RPM:</label>
-                <input type="number" id="calc-driver-rpm" value="1450" step="1" min="1">
+                <input type="text" inputmode="decimal" id="calc-driver-rpm" value="1450" step="1" min="1">
             </div>
             
             <div class="form-group">
                 <label>Driver pulley diameter (cm):</label>
-                <input type="number" id="calc-driver-dia" value="10" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="calc-driver-dia" value="10" step="0.1" min="0.1">
             </div>
             
             <div class="form-group">
                 <label>Driven pulley diameter (cm):</label>
-                <input type="number" id="calc-driven-dia" value="18" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="calc-driven-dia" value="18" step="0.1" min="0.1">
             </div>
             
             <div class="form-group">
                 <label>Center distance (cm):</label>
-                <input type="number" id="calc-distance" value="65" step="0.1" min="1">
+                <input type="text" inputmode="decimal" id="calc-distance" value="65" step="0.1" min="1">
             </div>
             
             <button onclick="calculatePulleys()">Calculate</button>
@@ -82,17 +82,17 @@
             <h3>Find driven pulley diameter for target RPM</h3>
             <div class="form-group">
                 <label>Driver pulley RPM:</label>
-                <input type="number" id="find-driver-rpm" value="1450" step="1" min="1">
+                <input type="text" inputmode="decimal" id="find-driver-rpm" value="1450" step="1" min="1">
             </div>
             
             <div class="form-group">
                 <label>Driver pulley diameter (cm):</label>
-                <input type="number" id="find-driver-dia" value="10" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="find-driver-dia" value="10" step="0.1" min="0.1">
             </div>
             
             <div class="form-group">
                 <label>Target driven pulley RPM:</label>
-                <input type="number" id="find-target-rpm" value="805" step="1" min="1">
+                <input type="text" inputmode="decimal" id="find-target-rpm" value="805" step="1" min="1">
             </div>
             
             <button onclick="findDiameter()">Calculate</button>
@@ -103,6 +103,7 @@
         </div>
     </div>
 
+    <script src="/static/fraction-input.js"></script>
     <script>
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -125,16 +126,16 @@
                 return;
             }
             
-            if (parseFloat(driverRpm) <= 0 || parseFloat(driverDia) <= 0 || parseFloat(drivenDia) <= 0 || parseFloat(distance) <= 0) {
+            if (parseFlexibleNumber(driverRpm) <= 0 || parseFlexibleNumber(driverDia) <= 0 || parseFlexibleNumber(drivenDia) <= 0 || parseFlexibleNumber(distance) <= 0) {
                 alert('All values must be greater than 0');
                 return;
             }
             
             await calculatePulley('calculate', {
-                driver_rpm: parseFloat(driverRpm),
-                driver_dia: parseFloat(driverDia),
-                driven_dia: parseFloat(drivenDia),
-                distance: parseFloat(distance)
+                driver_rpm: parseFlexibleNumber(driverRpm),
+                driver_dia: parseFlexibleNumber(driverDia),
+                driven_dia: parseFlexibleNumber(drivenDia),
+                distance: parseFlexibleNumber(distance)
             });
         }
         
@@ -148,15 +149,15 @@
                 return;
             }
             
-            if (parseFloat(driverRpm) <= 0 || parseFloat(driverDia) <= 0 || parseFloat(targetRpm) <= 0) {
+            if (parseFlexibleNumber(driverRpm) <= 0 || parseFlexibleNumber(driverDia) <= 0 || parseFlexibleNumber(targetRpm) <= 0) {
                 alert('All values must be greater than 0');
                 return;
             }
             
             await calculatePulley('find_diameter', {
-                driver_rpm: parseFloat(driverRpm),
-                driver_dia: parseFloat(driverDia),
-                target_rpm: parseFloat(targetRpm)
+                driver_rpm: parseFlexibleNumber(driverRpm),
+                driver_dia: parseFlexibleNumber(driverDia),
+                target_rpm: parseFlexibleNumber(targetRpm)
             });
         }
         

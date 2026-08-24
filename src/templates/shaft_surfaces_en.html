@@ -58,12 +58,12 @@
             <h3>Calculate flat surface for given width</h3>
             <div class="form-group">
                 <label>Shaft diameter (mm):</label>
-                <input type="number" id="flat-diameter" value="25" step="0.1" min="1">
+                <input type="text" inputmode="decimal" id="flat-diameter" value="25" step="0.1" min="1">
             </div>
             
             <div class="form-group">
                 <label>Flat width (mm):</label>
-                <input type="number" id="flat-width" value="7" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="flat-width" value="7" step="0.1" min="0.1">
             </div>
             
             <button onclick="calculateFlat()">Calculate</button>
@@ -73,7 +73,7 @@
             <h3>Calculate maximum square on shaft</h3>
             <div class="form-group">
                 <label>Shaft diameter (mm):</label>
-                <input type="number" id="square-diameter" value="25" step="0.1" min="1">
+                <input type="text" inputmode="decimal" id="square-diameter" value="25" step="0.1" min="1">
             </div>
             
             <button onclick="calculateSquare()">Calculate</button>
@@ -83,12 +83,12 @@
             <h3>Calculate square with custom dimension</h3>
             <div class="form-group">
                 <label>Shaft diameter (mm):</label>
-                <input type="number" id="custom-diameter" value="25" step="0.1" min="1">
+                <input type="text" inputmode="decimal" id="custom-diameter" value="25" step="0.1" min="1">
             </div>
             
             <div class="form-group">
                 <label>Square edge length (mm):</label>
-                <input type="number" id="custom-edge" value="15" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="custom-edge" value="15" step="0.1" min="0.1">
             </div>
             
             <button onclick="calculateCustomSquare()">Calculate</button>
@@ -99,6 +99,7 @@
         </div>
     </div>
 
+    <script src="/static/fraction-input.js"></script>
     <script>
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -119,19 +120,19 @@
                 return;
             }
             
-            if (parseFloat(diameter) <= 0 || parseFloat(width) <= 0) {
+            if (parseFlexibleNumber(diameter) <= 0 || parseFlexibleNumber(width) <= 0) {
                 alert('All values must be greater than 0');
                 return;
             }
             
-            if (parseFloat(width) >= parseFloat(diameter)) {
+            if (parseFlexibleNumber(width) >= parseFlexibleNumber(diameter)) {
                 alert('Flat width must be smaller than shaft diameter');
                 return;
             }
             
             await calculateSurface('flat', {
-                diameter: parseFloat(diameter),
-                width: parseFloat(width)
+                diameter: parseFlexibleNumber(diameter),
+                width: parseFlexibleNumber(width)
             });
         }
         
@@ -143,13 +144,13 @@
                 return;
             }
             
-            if (parseFloat(diameter) <= 0) {
+            if (parseFlexibleNumber(diameter) <= 0) {
                 alert('Diameter must be greater than 0');
                 return;
             }
             
             await calculateSurface('square', {
-                diameter: parseFloat(diameter)
+                diameter: parseFlexibleNumber(diameter)
             });
         }
         
@@ -162,19 +163,19 @@
                 return;
             }
             
-            if (parseFloat(diameter) <= 0 || parseFloat(edgeLength) <= 0) {
+            if (parseFlexibleNumber(diameter) <= 0 || parseFlexibleNumber(edgeLength) <= 0) {
                 alert('All values must be greater than 0');
                 return;
             }
             
-            if (parseFloat(edgeLength) >= parseFloat(diameter)) {
+            if (parseFlexibleNumber(edgeLength) >= parseFlexibleNumber(diameter)) {
                 alert('Square edge length must be smaller than shaft diameter');
                 return;
             }
             
             await calculateSurface('square_custom', {
-                diameter: parseFloat(diameter),
-                edge_length: parseFloat(edgeLength)
+                diameter: parseFlexibleNumber(diameter),
+                edge_length: parseFlexibleNumber(edgeLength)
             });
         }
         

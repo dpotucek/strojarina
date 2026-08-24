@@ -69,17 +69,17 @@
             <form id="dilutionForm" onsubmit="calculateDilution(event)">
                 <div class="form-group">
                     <label for="v_start">Počáteční objem alkoholu (litry):</label>
-                    <input type="number" id="v_start" step="0.001" min="0.001" required placeholder="např. 1.0">
+                    <input type="text" inputmode="decimal" id="v_start" step="0.001" min="0.001" required placeholder="např. 1.0">
                 </div>
                 
                 <div class="form-group">
                     <label for="c_poc_dil">Počáteční koncentrace (%):</label>
-                    <input type="number" id="c_poc_dil" step="0.1" min="0.1" max="100" required placeholder="např. 74">
+                    <input type="text" inputmode="decimal" id="c_poc_dil" step="0.1" min="0.1" max="100" required placeholder="např. 74">
                 </div>
                 
                 <div class="form-group">
                     <label for="c_cil_dil">Cílová koncentrace (%):</label>
-                    <input type="number" id="c_cil_dil" step="0.1" min="0.1" max="100" required placeholder="např. 40">
+                    <input type="text" inputmode="decimal" id="c_cil_dil" step="0.1" min="0.1" max="100" required placeholder="např. 40">
                 </div>
                 
                 <button type="submit">Vypočítat</button>
@@ -98,17 +98,17 @@
             <form id="mixingForm" onsubmit="calculateMixing(event)">
                 <div class="form-group">
                     <label for="v_cil">Požadovaný celkový objem (litry):</label>
-                    <input type="number" id="v_cil" step="0.001" min="0.001" required placeholder="např. 10.0">
+                    <input type="text" inputmode="decimal" id="v_cil" step="0.001" min="0.001" required placeholder="např. 10.0">
                 </div>
                 
                 <div class="form-group">
                     <label for="c_poc_mix">Koncentrace dostupného alkoholu (%):</label>
-                    <input type="number" id="c_poc_mix" step="0.1" min="0.1" max="100" required placeholder="např. 74">
+                    <input type="text" inputmode="decimal" id="c_poc_mix" step="0.1" min="0.1" max="100" required placeholder="např. 74">
                 </div>
                 
                 <div class="form-group">
                     <label for="c_cil_mix">Požadovaná cílová koncentrace (%):</label>
-                    <input type="number" id="c_cil_mix" step="0.1" min="0.1" max="100" required placeholder="např. 40">
+                    <input type="text" inputmode="decimal" id="c_cil_mix" step="0.1" min="0.1" max="100" required placeholder="např. 40">
                 </div>
                 
                 <button type="submit">Vypočítat</button>
@@ -118,6 +118,7 @@
         </div>
     </div>
     
+    <script src="/static/fraction-input.js"></script>
     <script>
         function switchTab(tabName) {
             // Hide all tabs
@@ -141,9 +142,9 @@
             event.preventDefault();
             
             const data = {
-                v_start: parseFloat(document.getElementById('v_start').value),
-                c_poc: parseFloat(document.getElementById('c_poc_dil').value),
-                c_cil: parseFloat(document.getElementById('c_cil_dil').value)
+                v_start: parseFlexibleNumber(document.getElementById('v_start').value),
+                c_poc: parseFlexibleNumber(document.getElementById('c_poc_dil').value),
+                c_cil: parseFlexibleNumber(document.getElementById('c_cil_dil').value)
             };
             
             try {
@@ -164,9 +165,9 @@
             event.preventDefault();
             
             const data = {
-                v_cil: parseFloat(document.getElementById('v_cil').value),
-                c_poc: parseFloat(document.getElementById('c_poc_mix').value),
-                c_cil: parseFloat(document.getElementById('c_cil_mix').value)
+                v_cil: parseFlexibleNumber(document.getElementById('v_cil').value),
+                c_poc: parseFlexibleNumber(document.getElementById('c_poc_mix').value),
+                c_cil: parseFlexibleNumber(document.getElementById('c_cil_mix').value)
             };
             
             try {

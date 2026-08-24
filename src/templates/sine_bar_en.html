@@ -57,17 +57,17 @@
             <h3>Link Method</h3>
             <div class="form-group">
                 <label>Required angle (°):</label>
-                <input type="number" id="link-angle" value="15" step="0.1" min="0.1" max="89.9">
+                <input type="text" inputmode="decimal" id="link-angle" value="15" step="0.1" min="0.1" max="89.9">
             </div>
             
             <div class="form-group">
                 <label>Bigger cylinder diameter:</label>
-                <input type="number" id="link-big-cylinder" value="20" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="link-big-cylinder" value="20" step="0.1" min="0.1">
             </div>
             
             <div class="form-group">
                 <label>Cylinder center distance:</label>
-                <input type="number" id="link-center-distance" value="3" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="link-center-distance" value="3" step="0.1" min="0.1">
             </div>
             
             <button onclick="calculateLink()">Calculate</button>
@@ -77,12 +77,12 @@
             <h3>Contact Method</h3>
             <div class="form-group">
                 <label>Required angle (°):</label>
-                <input type="number" id="contact-angle" value="15" step="0.1" min="0.1" max="89.9">
+                <input type="text" inputmode="decimal" id="contact-angle" value="15" step="0.1" min="0.1" max="89.9">
             </div>
             
             <div class="form-group">
                 <label>Bigger cylinder diameter:</label>
-                <input type="number" id="contact-big-cylinder" value="20" step="0.1" min="0.1">
+                <input type="text" inputmode="decimal" id="contact-big-cylinder" value="20" step="0.1" min="0.1">
             </div>
             
             <button onclick="calculateContact()">Calculate</button>
@@ -93,6 +93,7 @@
         </div>
     </div>
 
+    <script src="/static/fraction-input.js"></script>
     <script>
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -114,20 +115,20 @@
                 return;
             }
             
-            if (parseFloat(angle) <= 0 || parseFloat(angle) >= 90) {
+            if (parseFlexibleNumber(angle) <= 0 || parseFlexibleNumber(angle) >= 90) {
                 alert('Angle must be between 0° and 90°');
                 return;
             }
             
-            if (parseFloat(bigCylinder) <= 0 || parseFloat(centerDistance) <= 0) {
+            if (parseFlexibleNumber(bigCylinder) <= 0 || parseFlexibleNumber(centerDistance) <= 0) {
                 alert('All values must be greater than 0');
                 return;
             }
             
             await calculateSineBar('link', {
-                angle: parseFloat(angle),
-                big_cylinder: parseFloat(bigCylinder),
-                center_distance: parseFloat(centerDistance)
+                angle: parseFlexibleNumber(angle),
+                big_cylinder: parseFlexibleNumber(bigCylinder),
+                center_distance: parseFlexibleNumber(centerDistance)
             });
         }
         
@@ -140,19 +141,19 @@
                 return;
             }
             
-            if (parseFloat(angle) <= 0 || parseFloat(angle) >= 90) {
+            if (parseFlexibleNumber(angle) <= 0 || parseFlexibleNumber(angle) >= 90) {
                 alert('Angle must be between 0° and 90°');
                 return;
             }
             
-            if (parseFloat(bigCylinder) <= 0) {
+            if (parseFlexibleNumber(bigCylinder) <= 0) {
                 alert('Cylinder diameter must be greater than 0');
                 return;
             }
             
             await calculateSineBar('contact', {
-                angle: parseFloat(angle),
-                big_cylinder: parseFloat(bigCylinder)
+                angle: parseFlexibleNumber(angle),
+                big_cylinder: parseFlexibleNumber(bigCylinder)
             });
         }
         

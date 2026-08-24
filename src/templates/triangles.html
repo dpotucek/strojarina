@@ -71,27 +71,27 @@
 
                 <div class="form-group">
                     <label for="a">Strana a:</label>
-                    <input type="number" id="a" name="a" step="any" placeholder="Strana protilehlá úhlu A">
+                    <input type="text" inputmode="decimal" id="a" name="a" step="any" placeholder="Strana protilehlá úhlu A">
                 </div>
 
                 <div class="form-group">
                     <label for="b">Strana b:</label>
-                    <input type="number" id="b" name="b" step="any" placeholder="Strana protilehlá úhlu B">
+                    <input type="text" inputmode="decimal" id="b" name="b" step="any" placeholder="Strana protilehlá úhlu B">
                 </div>
 
                 <div class="form-group">
                     <label for="c">Přepona c:</label>
-                    <input type="number" id="c" name="c" step="any" placeholder="Přepona">
+                    <input type="text" inputmode="decimal" id="c" name="c" step="any" placeholder="Přepona">
                 </div>
 
                 <div class="form-group">
                     <label for="angle_A">Úhel A (°):</label>
-                    <input type="number" id="angle_A" name="angle_A" step="any" placeholder="Úhel protilehlý straně a">
+                    <input type="text" inputmode="decimal" id="angle_A" name="angle_A" step="any" placeholder="Úhel protilehlý straně a">
                 </div>
 
                 <div class="form-group">
                     <label for="angle_B">Úhel B (°):</label>
-                    <input type="number" id="angle_B" name="angle_B" step="any" placeholder="Úhel protilehlý straně b">
+                    <input type="text" inputmode="decimal" id="angle_B" name="angle_B" step="any" placeholder="Úhel protilehlý straně b">
                 </div>
 
                 <button type="submit">Vypočítat</button>
@@ -120,32 +120,32 @@
 
                 <div class="form-group">
                     <label for="common-a">Strana a:</label>
-                    <input type="number" id="common-a" name="a" step="any" placeholder="Strana protilehlá úhlu A">
+                    <input type="text" inputmode="decimal" id="common-a" name="a" step="any" placeholder="Strana protilehlá úhlu A">
                 </div>
 
                 <div class="form-group">
                     <label for="common-b">Strana b:</label>
-                    <input type="number" id="common-b" name="b" step="any" placeholder="Strana protilehlá úhlu B">
+                    <input type="text" inputmode="decimal" id="common-b" name="b" step="any" placeholder="Strana protilehlá úhlu B">
                 </div>
 
                 <div class="form-group">
                     <label for="common-c">Strana c:</label>
-                    <input type="number" id="common-c" name="c" step="any" placeholder="Strana protilehlá úhlu C">
+                    <input type="text" inputmode="decimal" id="common-c" name="c" step="any" placeholder="Strana protilehlá úhlu C">
                 </div>
 
                 <div class="form-group">
                     <label for="common-angle_A">Úhel A (°):</label>
-                    <input type="number" id="common-angle_A" name="angle_A" step="any" placeholder="Úhel protilehlý straně a">
+                    <input type="text" inputmode="decimal" id="common-angle_A" name="angle_A" step="any" placeholder="Úhel protilehlý straně a">
                 </div>
 
                 <div class="form-group">
                     <label for="common-angle_B">Úhel B (°):</label>
-                    <input type="number" id="common-angle_B" name="angle_B" step="any" placeholder="Úhel protilehlý straně b">
+                    <input type="text" inputmode="decimal" id="common-angle_B" name="angle_B" step="any" placeholder="Úhel protilehlý straně b">
                 </div>
 
                 <div class="form-group">
                     <label for="common-angle_C">Úhel C (°):</label>
-                    <input type="number" id="common-angle_C" name="angle_C" step="any" placeholder="Úhel protilehlý straně c">
+                    <input type="text" inputmode="decimal" id="common-angle_C" name="angle_C" step="any" placeholder="Úhel protilehlý straně c">
                 </div>
 
                 <button type="submit">Vypočítat</button>
@@ -164,6 +164,7 @@
         <a href="/" class="back-link">← Zpět na hlavní stránku</a>
     </div>
 
+    <script src="/static/fraction-input.js"></script>
     <script>
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;

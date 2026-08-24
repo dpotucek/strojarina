@@ -38,7 +38,7 @@
         
         <div class="form-group">
             <label>Požadované stoupání:</label>
-            <input type="number" id="pozadovane_stoupani" value="" step="0.1" min="0.1">
+            <input type="text" inputmode="decimal" id="pozadovane_stoupani" value="" step="0.1" min="0.1">
         </div>
         
         <div class="form-group">
@@ -60,6 +60,7 @@
         <a href="/" class="back-link">← Zpět na hlavní stránku</a>
     </div>
 
+    <script src="/static/fraction-input.js"></script>
     <script>
         async function vypocitatDifferential() {
             const pozadovane_stoupani = document.getElementById('pozadovane_stoupani').value;
@@ -74,7 +75,7 @@
                 const response = await fetch('/api/differential', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({pozadovane_stoupani: parseFloat(pozadovane_stoupani), jednotky: jednotky})
+                    body: JSON.stringify({pozadovane_stoupani: parseFlexibleNumber(pozadovane_stoupani), jednotky: jednotky})
                 });
                 
                 const data = await response.json();

@@ -17,21 +17,50 @@ from tappingDrills import MetricThread
 from triangles import RightTriangle, CommonTriangle, PrecisionSettings
 from daptools.redeni import dilution, mixing
 import math
+import re
+from fractions import Fraction
 
 # Thread pitch constants for performance
 STOUPANI_MM = [0.4, 0.45, 0.5, 0.6, 0.7, 0.75, 0.8, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
 STOUPANI_TPI = [4, 4.5, 5, 5.5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 56, 64, 72, 80]
 
+def parse_numeric(value):
+    """Parse a decimal or fractional number entered in the web UI."""
+    if isinstance(value, bool):
+        raise ValueError("boolean is not a number")
+    if isinstance(value, (int, float)):
+        result = float(value)
+    else:
+        text = str(value).strip().replace(',', '.').replace('⁄', '/')
+        if not text:
+            raise ValueError("empty value")
+        match = re.fullmatch(
+            r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))(?:\s+|-)(\d+/\d+)', text
+        )
+        if match:
+            numerator, denominator = match.group(2).split('/')
+            if denominator == '0':
+                raise ValueError("fraction denominator cannot be zero")
+            result = float(match.group(1)) + float(Fraction(int(numerator), int(denominator)))
+        elif re.fullmatch(r'[+-]?\d+/\d+', text):
+            numerator, denominator = text.split('/')
+            if denominator == '0':
+                raise ValueError("fraction denominator cannot be zero")
+            result = float(Fraction(int(numerator), int(denominator)))
+        else:
+            result = float(text)
+    if not math.isfinite(result):
+        raise ValueError("value must be finite")
+    return result
+
+
 def safe_float(value, param_name):
-    """Safely convert value to float with validation"""
+    """Safely convert a decimal or fraction to float with validation."""
     if value is None:
         raise ValueError(f"Missing required parameter: {param_name}")
     try:
-        result = float(value)
-        if math.isnan(result) or math.isinf(result):
-            raise ValueError(f"Invalid numeric value for {param_name}")
-        return result
-    except (ValueError, TypeError):
+        return parse_numeric(value)
+    except (ValueError, TypeError, ZeroDivisionError):
         raise ValueError(f"Invalid numeric value for {param_name}: {value}")
 
 def safe_int(value, param_name):
@@ -208,7 +237,7 @@ def get_options():
 @app.route('/api/differential', methods=['POST'])
 def calculate_differential():
     data = request.json
-    pozadovane_stoupani = float(data.get('pozadovane_stoupani'))
+    pozadovane_stoupani = safe_float(data.get('pozadovane_stoupani'), 'pozadovane_stoupani')
     jednotky = data.get('jednotky', 'mm')
     
     # Kontrola, zda je požadované stoupání přímo dostupné
@@ -251,7 +280,7 @@ def calculate_differential():
 def calculate_division_plate():
     data = request.json
     divisions = int(data.get('divisions'))
-    diameter = float(data.get('diameter'))
+    diameter = safe_float(data.get('diameter'), 'diameter')
     
     try:
         small_disk_radius = calculate_disks_radius(divisions, diameter)
@@ -275,7 +304,7 @@ def calculate_division_plate():
 @app.route('/api/find-thread', methods=['POST'])
 def find_thread_api():
     data = request.json
-    value = float(data.get('value'))
+    value = safe_float(data.get('value'), 'value')
     units = data.get('units', 'mm')
     criterion = data.get('criterion', 'diameter')
     
@@ -312,8 +341,8 @@ def find_thread_api():
 @app.route('/api/knurling', methods=['POST'])
 def calculate_knurling():
     data = request.json
-    pitch = float(data.get('pitch'))
-    diameter = float(data.get('diameter'))
+    pitch = safe_float(data.get('pitch'), 'pitch')
+    diameter = safe_float(data.get('diameter'), 'diameter')
     
     try:
         crest_count, required_circumference, ideal_diameter = count_crest_num4_dia(pitch, diameter)
@@ -339,7 +368,7 @@ def calculate_knurling():
 def calculate_shaft_surfaces():
     data = request.json
     calculation_type = data.get('type')  # 'flat' or 'square'
-    diameter = float(data.get('diameter'))
+    diameter = safe_float(data.get('diameter'), 'diameter')
     
     try:
         pnh = PlochyNaHrideli()
@@ -354,7 +383,7 @@ def calculate_shaft_surfaces():
                 'edge_length': round(edge_length, 2)
             }
         elif calculation_type == 'square_custom':
-            edge_length = float(data.get('edge_length'))
+            edge_length = safe_float(data.get('edge_length'), 'edge_length')
             depth = pnh.hloubka_ctverce_custom(diameter, edge_length)
             result = {
                 'success': True,
@@ -364,7 +393,7 @@ def calculate_shaft_surfaces():
                 'depth': round(depth, 2)
             }
         else:  # flat surface
-            width = float(data.get('width'))
+            width = safe_float(data.get('width'), 'width')
             depth = pnh.hloubka_plosky(diameter, width)
             result = {
                 'success': True,
@@ -384,9 +413,9 @@ def calculate_shaft_surfaces():
 @app.route('/api/material-bending', methods=['POST'])
 def calculate_material_bending():
     data = request.json
-    thickness = float(data.get('thickness'))  # mm
-    radius = float(data.get('radius'))        # mm
-    angle = float(data.get('angle'))          # degrees
+    thickness = safe_float(data.get('thickness'), 'thickness')  # mm
+    radius = safe_float(data.get('radius'), 'radius')        # mm
+    angle = safe_float(data.get('angle'), 'angle')          # degrees
     
     try:
         # Convert to inches for calculation (as in original)
@@ -437,10 +466,10 @@ def calculate_pulleys():
     
     try:
         if calculation_type == 'calculate':
-            driver_rpm = float(data.get('driver_rpm'))
-            driver_dia = float(data.get('driver_dia'))
-            driven_dia = float(data.get('driven_dia'))
-            distance = float(data.get('distance'))
+            driver_rpm = safe_float(data.get('driver_rpm'), 'driver_rpm')
+            driver_dia = safe_float(data.get('driver_dia'), 'driver_dia')
+            driven_dia = safe_float(data.get('driven_dia'), 'driven_dia')
+            distance = safe_float(data.get('distance'), 'distance')
             
             driven_rpm, belt_length = calculate2_pulleys(driver_rpm, driver_dia, driven_dia, distance)
             
@@ -455,9 +484,9 @@ def calculate_pulleys():
                 'belt_length': round(belt_length, 2)
             }
         else:  # find_diameter
-            driver_rpm = float(data.get('driver_rpm'))
-            driver_dia = float(data.get('driver_dia'))
-            target_rpm = float(data.get('target_rpm'))
+            driver_rpm = safe_float(data.get('driver_rpm'), 'driver_rpm')
+            driver_dia = safe_float(data.get('driver_dia'), 'driver_dia')
+            target_rpm = safe_float(data.get('target_rpm'), 'target_rpm')
             
             driven_dia = find_driven_diameter(driver_rpm, target_rpm, driver_dia)
             
@@ -481,12 +510,12 @@ def calculate_pulleys():
 def calculate_sine_bar():
     data = request.json
     method = data.get('method')  # 'link' or 'contact'
-    angle = float(data.get('angle'))
-    big_cylinder = float(data.get('big_cylinder'))
+    angle = safe_float(data.get('angle'), 'angle')
+    big_cylinder = safe_float(data.get('big_cylinder'), 'big_cylinder')
     
     try:
         if method == 'link':
-            center_distance = float(data.get('center_distance'))
+            center_distance = safe_float(data.get('center_distance'), 'center_distance')
             small_cylinder = 2 * center_distance * math.sin(0.5 * math.radians(angle)) + big_cylinder
             
             result = {
@@ -519,9 +548,9 @@ def calculate_sine_bar():
 @app.route('/api/tapping-drills', methods=['POST'])
 def calculate_tapping_drill():
     data = request.json
-    thread_diameter = float(data.get('thread_diameter'))
-    thread_pitch = float(data.get('thread_pitch'))
-    thread_strength = float(data.get('thread_strength', 75))
+    thread_diameter = safe_float(data.get('thread_diameter'), 'thread_diameter')
+    thread_pitch = safe_float(data.get('thread_pitch'), 'thread_pitch')
+    thread_strength = safe_float(data.get('thread_strength', 75), 'thread_strength')
     
     try:
         drill_diameter = MetricThread.countTapDrillSingle(thread_diameter, thread_pitch, thread_strength)

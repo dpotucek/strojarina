@@ -80,7 +80,7 @@
         <div id="deleni" class="tab-content">
             <div class="form-group">
                 <label>Požadované dělení:</label>
-                <input type="number" id="pozadovane_deleni" value="" step="1" min="1">
+                <input type="text" inputmode="decimal" id="pozadovane_deleni" value="" step="1" min="1">
                 <button onclick="vypocitatDeleni()">Vypočítat</button>
             </div>
             <div id="deleni-results" class="results">
@@ -94,6 +94,7 @@
         <a href="/" class="back-link">← Zpět na hlavní stránku</a>
     </div>
 
+    <script src="/static/fraction-input.js"></script>
     <script>
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
