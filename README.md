@@ -14,6 +14,7 @@ Comprehensive toolset for machining calculations with modern web interface. Incl
 - **Ohýbání materiálu** - Material bending calculations
 - **Řemenice** - Pulley calculations and ratios
 - **Sinusová lišta** - Sine bar angle calculations
+- **Řezné podmínky** - Cutting speed, spindle speed and feed recommendations for turning, milling, drilling and reaming
 - **Závitníkové vrtáky** - Tapping drill size calculations
 - **Trojúhelníky** - Advanced triangle calculations with precision control, circles, medians, centroids
 

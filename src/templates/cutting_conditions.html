@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ labels.title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: url('/static/data/staraDilna.png') center center fixed; background-size: cover; min-height: 100vh; color: #212529; }
+        .container { max-width: 1100px; margin: 0 auto; background: rgba(255,255,255,.97); padding: 24px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+        .lang-switcher { text-align: right; margin-bottom: 15px; }
+        .lang-switcher a, .back-link a { color: #007bff; text-decoration: none; }
+        .lang-switcher a.active { color: #333; font-weight: bold; }
+        .description, .notice { padding: 12px 15px; border-radius: 5px; margin: 15px 0; }
+        .description { background: #e9ecef; color: #495057; }
+        .notice { background: #fff3cd; color: #664d03; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, select { box-sizing: border-box; width: 100%; padding: 9px; border: 1px solid #ced4da; border-radius: 4px; }
+        button { margin-top: 16px; padding: 10px 20px; color: white; background: #007bff; border: 0; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .results { margin-top: 18px; padding: 15px; background: #f8f9fa; border-radius: 5px; min-height: 35px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { padding: 9px; border: 1px solid #dee2e6; text-align: left; white-space: nowrap; }
+        th { background: #e9ecef; }
+        @media (max-width: 600px) { body { margin: 8px; } .container { padding: 14px; } }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="lang-switcher">
+            <a href="/cutting-conditions" class="{{ 'active' if lang == 'cs' else '' }}">CZ</a> |
+            <a href="/en/cutting-conditions" class="{{ 'active' if lang == 'en' else '' }}">EN</a>
+        </div>
+        <h1>{{ labels.title }}</h1>
+        <p class="description">{{ labels.description }}</p>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="material">{{ labels.material }}</label>
+                <select id="material">{% for key, names in materials.items() %}<option value="{{ key }}">{{ names[lang] }}</option>{% endfor %}</select>
+            </div>
+            <div class="form-group">
+                <label for="tool">{{ labels.tool }}</label>
+                <select id="tool">{% for key, names in tools.items() %}<option value="{{ key }}" {{ 'selected' if key == 'carbide' else '' }}>{{ names[lang] }}</option>{% endfor %}</select>
+            </div>
+            <div class="form-group">
+                <label for="operation">{{ labels.operation }}</label>
+                <select id="operation">{% for key, details in operations.items() %}<option value="{{ key }}">{{ details[lang] }}</option>{% endfor %}</select>
+            </div>
+            <div class="form-group">
+                <label for="diameter">{{ labels.diameter }}</label>
+                <input id="diameter" type="number" min="0.01" step="any" value="20">
+            </div>
+            <div class="form-group">
+                <label for="cutting-speed">{{ labels.cutting_speed }}</label>
+                <input id="cutting-speed" type="number" min="0.01" step="any" value="170">
+            </div>
+            <div class="form-group">
+                <label for="feed"><span id="feed-label">{{ labels.feed }}</span> (<span id="feed-unit">mm/rev</span>)</label>
+                <input id="feed" type="number" min="0.001" step="any" value="0.325">
+            </div>
+            <div class="form-group" id="teeth-group" hidden>
+                <label for="teeth">{{ labels.teeth }}</label>
+                <input id="teeth" type="number" min="1" step="1" value="4">
+            </div>
+            <div class="form-group">
+                <label for="machine-speeds">{{ labels.machine_speeds }}</label>
+                <input id="machine-speeds" type="text" value="{{ defaults|join(', ') }}">
+            </div>
+        </div>
+        <button id="calculate">{{ labels.calculate }}</button>
+        <div class="results" id="results" aria-live="polite">{{ labels.initial }}</div>
+        <p class="notice">{{ labels.warning }}</p>
+
+        <h2>{{ labels.reference }}</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr>
+                    <th>{{ labels.material }}</th><th>{{ labels.tool }}</th><th>{{ labels.operation }}</th>
+                    <th>{{ labels.speed }}</th><th>{{ labels.feed_range }}</th>
+                </tr></thead>
+                <tbody id="recommendations"></tbody>
+            </table>
+        </div>
+        <p class="back-link"><a href="{{ '/en' if lang == 'en' else '/' }}">← {{ labels.back }}</a></p>
+    </main>
+    <script>
+        const labels = {{ labels|tojson }};
+        const language = {{ lang|tojson }};
+        const materials = {{ materials|tojson }};
+        const tools = {{ tools|tojson }};
+        const operations = {{ operations|tojson }};
+        const elements = Object.fromEntries(['material', 'tool', 'operation', 'diameter', 'cutting-speed', 'feed', 'teeth', 'teeth-group', 'feed-unit', 'machine-speeds', 'recommendations', 'results'].map(id => [id, document.getElementById(id)]));
+        let recommendations = [];
+
+        function selectedRecommendation() {
+            return recommendations.find(row => row.material === elements.material.value &&
+                row.tool === elements.tool.value && row.operation === elements.operation.value);
+        }
+
+        function renderRecommendations() {
+            elements.recommendations.replaceChildren();
+            for (const row of recommendations) {
+                const tr = document.createElement('tr');
+                const values = [
+                    materials[row.material][language], tools[row.tool][language],
+                    operations[row.operation][language],
+                    `${row.speed_min}–${row.speed_max} m/min`,
+                    `${row.feed_min}–${row.feed_max} ${row.feed_unit}`
+                ];
+                for (const value of values) {
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                }
+                elements.recommendations.appendChild(tr);
+            }
+        }
+
+        function updateRecommendation() {
+            const row = selectedRecommendation();
+            if (!row) {
+                elements.results.textContent = labels.empty;
+                return;
+            }
+            elements['cutting-speed'].value = ((row.speed_min + row.speed_max) / 2).toFixed(1);
+            elements.feed.value = ((row.feed_min + row.feed_max) / 2).toFixed(3);
+            elements['feed-unit'].textContent = row.feed_unit;
+            elements['teeth-group'].hidden = row.operation !== 'milling';
+            renderRecommendations();
+        }
+
+        async function calculate() {
+            const body = {
+                material: elements.material.value,
+                tool: elements.tool.value,
+                operation: elements.operation.value,
+                diameter: elements.diameter.value,
+                cutting_speed: elements['cutting-speed'].value,
+                feed: elements.feed.value,
+                teeth: elements.teeth.value,
+                machine_speeds: elements['machine-speeds'].value
+            };
+            try {
+                const response = await fetch('/api/cutting-conditions/calculate', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) throw new Error(data.error || labels.validation);
+                const items = [
+                    `<p><strong>${labels.ideal_rpm}:</strong> ${data.ideal_rpm} rpm</p>`,
+                    `<p><strong>${labels.selected_rpm}:</strong> ${data.selected_rpm === null ? '—' : `${data.selected_rpm} rpm`}</p>`,
+                    data.selected_rpm === null
+                        ? `<p>${labels.no_safe_rpm}</p>`
+                        : `<p><strong>${labels.actual_speed}:</strong> ${data.actual_cutting_speed} m/min</p>
+                           <p><strong>${labels.feed_rate}:</strong> ${data.feed_rate} mm/min</p>`,
+                    `<p><strong>${labels.machine_list}:</strong> ${data.safe_machine_speeds.length ? data.safe_machine_speeds.join(', ') + ' rpm' : '—'}</p>`
+                ];
+                elements.results.innerHTML = `<h3>${labels.result}</h3>${items.join('')}`;
+            } catch (error) {
+                elements.results.textContent = `${labels.validation} ${error.message}`;
+            }
+        }
+
+        for (const id of ['material', 'tool', 'operation']) {
+            elements[id].addEventListener('change', updateRecommendation);
+        }
+        document.getElementById('calculate').addEventListener('click', calculate);
+        fetch('/api/cutting-conditions/recommendations')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                recommendations = data.recommendations;
+                updateRecommendation();
+            })
+            .catch(error => { elements.results.textContent = `${labels.validation} ${error.message}`; });
+    </script>
+</body>
+</html>

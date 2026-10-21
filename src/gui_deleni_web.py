@@ -16,6 +16,10 @@ from sineBar import calculate_link_sine_bar, calculate_contact_sine_bar
 from tappingDrills import MetricThread
 from triangles import RightTriangle, CommonTriangle, PrecisionSettings
 from daptools.redeni import dilution, mixing
+from cutting_conditions import (
+    DEFAULT_MACHINE_SPEEDS, MATERIALS, OPERATIONS, TOOLS,
+    calculate_conditions, get_recommendations,
+)
 import math
 import re
 from fractions import Fraction
@@ -166,6 +170,57 @@ def tapping_drills():
 @app.route('/en/tapping-drills')
 def tapping_drills_en():
     return render_template('tapping_drills_en.html')
+
+_CUTTING_LABELS = {
+    "cs": {
+        "title": "Řezné podmínky",
+        "description": "Orientační doporučení řezné rychlosti a posuvu podle materiálu, nástroje a operace. Hodnoty upravte podle výrobce nástroje, tuhosti stroje a upnutí.",
+        "material": "Materiál obrobku", "tool": "Materiál nástroje", "operation": "Operace",
+        "diameter": "Průměr nástroje / obrobku (mm)", "cutting_speed": "Řezná rychlost Vc (m/min)",
+        "feed": "Posuv", "teeth": "Počet zubů frézy",
+        "machine_speeds": "Dostupné otáčky stroje (ot/min, oddělené čárkou)",
+        "calculate": "Vypočítat", "reference": "Tabulka doporučených rychlostí a posuvů",
+        "speed": "Řezná rychlost Vc (m/min)", "feed_range": "Doporučený posuv",
+        "ideal_rpm": "Teoretické otáčky", "selected_rpm": "Doporučené dostupné otáčky",
+        "actual_speed": "Skutečná řezná rychlost", "feed_rate": "Posuv za minutu",
+        "machine_list": "Dostupné otáčky pod cílovou hodnotou",
+        "no_safe_rpm": "Žádné zadané otáčky nejsou nižší než vypočtené. Zvyšte otáčky stroje nebo snižte řeznou rychlost.",
+        "warning": "Jde o orientační výchozí hodnoty, nikoli záruku. Ověřte doporučení výrobce nástroje a bezpečné limity stroje.",
+        "initial": "Zadejte parametry a klikněte na Vypočítat.", "back": "Zpět na hlavní stránku",
+        "result": "Výsledek výpočtu", "empty": "Nejsou dostupná žádná doporučení.",
+        "validation": "Zkontrolujte zadané hodnoty.",
+    },
+    "en": {
+        "title": "Cutting Conditions",
+        "description": "Indicative cutting speed and feed recommendations by workpiece material, tool and operation. Adjust for tool-maker data, machine rigidity and workholding.",
+        "material": "Workpiece material", "tool": "Tool material", "operation": "Operation",
+        "diameter": "Tool / workpiece diameter (mm)", "cutting_speed": "Cutting speed Vc (m/min)",
+        "feed": "Feed", "teeth": "Number of milling teeth",
+        "machine_speeds": "Available machine speeds (rpm, comma-separated)",
+        "calculate": "Calculate", "reference": "Recommended cutting speeds and feeds",
+        "speed": "Cutting speed Vc (m/min)", "feed_range": "Recommended feed",
+        "ideal_rpm": "Theoretical spindle speed", "selected_rpm": "Recommended available spindle speed",
+        "actual_speed": "Actual cutting speed", "feed_rate": "Feed rate",
+        "machine_list": "Available speeds at or below target",
+        "no_safe_rpm": "None of the entered machine speeds is below the calculated target. Increase the available speeds or reduce cutting speed.",
+        "warning": "These are indicative starting values, not guarantees. Check tool-maker recommendations and safe machine limits.",
+        "initial": "Enter the parameters and click Calculate.", "back": "Back to main menu",
+        "result": "Calculation result", "empty": "No recommendations are available.",
+        "validation": "Check the entered values.",
+    },
+}
+
+@app.route('/cutting-conditions')
+def cutting_conditions():
+    return render_template('cutting_conditions.html', lang='cs', labels=_CUTTING_LABELS['cs'],
+                           materials=MATERIALS, tools=TOOLS, operations=OPERATIONS,
+                           defaults=DEFAULT_MACHINE_SPEEDS)
+
+@app.route('/en/cutting-conditions')
+def cutting_conditions_en():
+    return render_template('cutting_conditions.html', lang='en', labels=_CUTTING_LABELS['en'],
+                           materials=MATERIALS, tools=TOOLS, operations=OPERATIONS,
+                           defaults=DEFAULT_MACHINE_SPEEDS)
 
 @app.route('/triangles')
 def triangles():
@@ -663,6 +718,41 @@ def calculate_dilution():
         }
     
     return jsonify(result)
+
+@app.route('/api/cutting-conditions/recommendations')
+def cutting_conditions_recommendations():
+    return jsonify({
+        "materials": MATERIALS,
+        "tools": TOOLS,
+        "operations": OPERATIONS,
+        "recommendations": get_recommendations(),
+    })
+
+@app.route('/api/cutting-conditions/calculate', methods=['POST'])
+def calculate_cutting_conditions():
+    data = request.get_json(silent=True) or {}
+    try:
+        speed_values = data.get("machine_speeds", DEFAULT_MACHINE_SPEEDS)
+        if isinstance(speed_values, str):
+            speed_values = [safe_float(value.strip(), "machine_speeds")
+                            for value in speed_values.split(",") if value.strip()]
+        elif isinstance(speed_values, list):
+            speed_values = [safe_float(value, "machine_speeds") for value in speed_values]
+        else:
+            raise ValueError("Machine speeds must be a comma-separated string or a list")
+        result = calculate_conditions(
+            material=data.get("material"),
+            tool=data.get("tool"),
+            operation=data.get("operation"),
+            diameter=safe_float(data.get("diameter"), "diameter"),
+            cutting_speed=safe_float(data.get("cutting_speed"), "cutting_speed"),
+            feed=safe_float(data.get("feed"), "feed"),
+            machine_speeds=speed_values,
+            teeth=safe_int(data.get("teeth", 1), "teeth"),
+        )
+        return jsonify({"success": True, **result})
+    except (ValueError, TypeError) as error:
+        return jsonify({"success": False, "error": str(error)}), 400
 
 @app.route('/api/redeni/mixing', methods=['POST'])
 def calculate_mixing():
