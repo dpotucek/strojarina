@@ -15,6 +15,7 @@ Comprehensive toolset for machining calculations with modern web interface. Incl
 - **Řemenice** - Pulley calculations and ratios
 - **Sinusová lišta** - Sine bar angle calculations
 - **Řezné podmínky** - Cutting speed, spindle speed and feed recommendations for turning, milling, drilling and reaming
+- **Kužely** - Taper ratio and angle conversion, lathe setup, inspection dimensions and Morse/ISO taper references
 - **Závitníkové vrtáky** - Tapping drill size calculations
 - **Trojúhelníky** - Advanced triangle calculations with precision control, circles, medians, centroids
 

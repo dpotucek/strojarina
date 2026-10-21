@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ labels.title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: url('/static/data/staraDilna.png') center center fixed; background-size: cover; min-height: 100vh; color: #212529; }
+        .container { max-width: 1100px; margin: 0 auto; background: rgba(255,255,255,.97); padding: 24px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.18); }
+        .lang-switcher { text-align: right; margin-bottom: 15px; }
+        .lang-switcher a, .back-link a { color: #007bff; text-decoration: none; }
+        .lang-switcher a.active { color: #333; font-weight: bold; }
+        .description, .note { padding: 12px 15px; border-radius: 5px; margin: 15px 0; }
+        .description { background: #e9ecef; color: #495057; }
+        .note { background: #fff3cd; color: #664d03; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input { box-sizing: border-box; width: 100%; padding: 9px; border: 1px solid #ced4da; border-radius: 4px; }
+        button { margin: 12px 8px 0 0; padding: 10px 18px; color: white; background: #007bff; border: 0; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .results { margin: 16px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; min-height: 24px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 9px; border: 1px solid #dee2e6; text-align: left; white-space: nowrap; }
+        th { background: #e9ecef; }
+        section { margin-top: 28px; }
+        @media (max-width: 600px) { body { margin: 8px; } .container { padding: 14px; } }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="lang-switcher">
+            <a href="/tapers" class="{{ 'active' if lang == 'cs' else '' }}">CZ</a> |
+            <a href="/en/tapers" class="{{ 'active' if lang == 'en' else '' }}">EN</a>
+        </div>
+        <h1>{{ labels.title }}</h1>
+        <p class="description">{{ labels.description }}</p>
+
+        <section>
+            <h2>{{ labels.calculate }}</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="large-diameter">{{ labels.large_diameter }}</label>
+                    <input id="large-diameter" type="number" min="0.001" step="any" value="30">
+                </div>
+                <div class="form-group">
+                    <label for="small-diameter">{{ labels.small_diameter }}</label>
+                    <input id="small-diameter" type="number" min="0.001" step="any" value="20">
+                </div>
+                <div class="form-group">
+                    <label for="taper-length">{{ labels.taper_length }}</label>
+                    <input id="taper-length" type="number" min="0.001" step="any" value="100">
+                </div>
+                <div class="form-group">
+                    <label for="work-length">{{ labels.work_length }}</label>
+                    <input id="work-length" type="number" min="0.001" step="any" value="200">
+                </div>
+            </div>
+            <button id="calculate-taper">{{ labels.calculate }}</button>
+            <div id="taper-result" class="results" aria-live="polite"></div>
+            <p class="note">{{ labels.calculation_note }}</p>
+        </section>
+
+        <section>
+            <h2>{{ labels.ratio_converter }}</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ratio-numerator">{{ labels.ratio_numerator }}</label>
+                    <input id="ratio-numerator" type="number" min="0.001" step="any" value="1">
+                    <label for="ratio-denominator">{{ labels.ratio_denominator }}</label>
+                    <input id="ratio-denominator" type="number" min="0.001" step="any" value="20">
+                    <button id="ratio-button">{{ labels.convert_ratio }}</button>
+                </div>
+                <div class="form-group">
+                    <label for="included-angle">{{ labels.included_angle }}</label>
+                    <input id="included-angle" type="number" min="0.001" max="179.999" step="any" value="2.8624">
+                    <button id="angle-button">{{ labels.convert_angle }}</button>
+                </div>
+            </div>
+            <div id="conversion-result" class="results" aria-live="polite"></div>
+        </section>
+
+        <section>
+            <h2>{{ labels.morse_table }}</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th>{{ labels.taper_size }}</th>
+                        <th>{{ labels.large_end }}</th>
+                        <th>{{ labels.diameter_change }}</th>
+                        <th>{{ labels.cone_ratio }}</th>
+                        <th>{{ labels.reference_angle }}</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for taper in morse_tapers %}
+                        {% set angles = taper_angles[loop.index0] %}
+                        <tr>
+                            <td>{{ taper.name }}</td>
+                            <td>{{ '%.3f'|format(taper.large_diameter) }}</td>
+                            <td>{{ '%.3f'|format(100 / taper.ratio_denominator) }}</td>
+                            <td>1:{{ '%.3f'|format(taper.ratio_denominator) }}</td>
+                            <td>{{ '%.3f'|format(angles.half_angle_deg) }} / {{ '%.3f'|format(angles.included_angle_deg) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>{{ labels.iso_table }}</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th>{{ labels.taper_size }}</th>
+                        <th>{{ labels.large_end }}</th>
+                        <th>{{ labels.reference_diameter }}</th>
+                        <th>{{ labels.cone_ratio }}</th>
+                        <th>{{ labels.reference_angle }}</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for taper in iso_tapers %}
+                        <tr>
+                            <td>{{ taper.name }}</td>
+                            <td>{{ '%.3f'|format(taper.gauge_diameter) }}</td>
+                            <td>{{ '%.3f'|format(taper.gauge_diameter - 7) }}</td>
+                            <td>7:24</td>
+                            <td>{{ '%.3f'|format(iso_angle.half_angle_deg) }} / {{ '%.3f'|format(iso_angle.included_angle_deg) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <p class="note">{{ labels.reference_note }}</p>
+        <p class="back-link"><a href="{{ '/en' if lang == 'en' else '/' }}">← {{ labels.back }}</a></p>
+    </main>
+    <script>
+        const labels = {{ labels|tojson }};
+        const numberFormat = new Intl.NumberFormat({{ lang|tojson }}, {maximumFractionDigits: 4});
+        const taperResult = document.getElementById('taper-result');
+        const conversionResult = document.getElementById('conversion-result');
+
+        function addResultLine(container, label, value) {
+            const line = document.createElement('p');
+            const strong = document.createElement('strong');
+            strong.textContent = `${label}: `;
+            line.append(strong, document.createTextNode(value));
+            container.appendChild(line);
+        }
+
+        function showError(container, error) {
+            console.error('Taper calculation failed:', error);
+            container.textContent = labels.error;
+        }
+
+        async function postJson(url, body) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || labels.required);
+            return data;
+        }
+
+        document.getElementById('calculate-taper').addEventListener('click', async () => {
+            try {
+                const result = await postJson('/api/tapers/calculate', {
+                    large_diameter: document.getElementById('large-diameter').value,
+                    small_diameter: document.getElementById('small-diameter').value,
+                    taper_length: document.getElementById('taper-length').value,
+                    work_length: document.getElementById('work-length').value
+                });
+                taperResult.replaceChildren();
+                addResultLine(taperResult, labels.ratio, `1:${numberFormat.format(result.ratio_denominator)}`);
+                addResultLine(taperResult, labels.included_angle, `${numberFormat.format(result.included_angle_deg)}°`);
+                addResultLine(taperResult, labels.half_angle, `${numberFormat.format(result.half_angle_deg)}°`);
+                addResultLine(taperResult, labels.diameter_difference, `${numberFormat.format(result.diameter_difference)} mm`);
+                addResultLine(taperResult, labels.tailstock_offset, `${numberFormat.format(result.tailstock_offset)} mm`);
+                addResultLine(taperResult, labels.top_slide_angle, `${numberFormat.format(result.top_slide_angle_deg)}°`);
+                const heading = document.createElement('h3');
+                heading.textContent = labels.check_dimensions;
+                taperResult.appendChild(heading);
+                const table = document.createElement('table');
+                const header = document.createElement('tr');
+                for (const text of [labels.distance, labels.check_diameter]) {
+                    const th = document.createElement('th');
+                    th.textContent = text;
+                    header.appendChild(th);
+                }
+                table.appendChild(header);
+                for (const point of result.checkpoints) {
+                    const row = document.createElement('tr');
+                    for (const value of [`${numberFormat.format(point.distance)} mm`, `${numberFormat.format(point.diameter)} mm`]) {
+                        const cell = document.createElement('td');
+                        cell.textContent = value;
+                        row.appendChild(cell);
+                    }
+                    table.appendChild(row);
+                }
+                taperResult.appendChild(table);
+            } catch (error) {
+                showError(taperResult, error);
+            }
+        });
+
+        document.getElementById('ratio-button').addEventListener('click', async () => {
+            try {
+                const result = await postJson('/api/tapers/ratio-to-angle', {
+                    ratio_numerator: document.getElementById('ratio-numerator').value,
+                    ratio_denominator: document.getElementById('ratio-denominator').value
+                });
+                conversionResult.replaceChildren();
+                addResultLine(conversionResult, labels.ratio_result, `${numberFormat.format(result.ratio_numerator)}:${numberFormat.format(result.ratio_denominator)}`);
+                addResultLine(conversionResult, labels.half_angle, `${numberFormat.format(result.half_angle_deg)}°`);
+                addResultLine(conversionResult, labels.included_angle, `${numberFormat.format(result.included_angle_deg)}°`);
+                document.getElementById('included-angle').value = result.included_angle_deg.toFixed(6);
+            } catch (error) {
+                showError(conversionResult, error);
+            }
+        });
+
+        document.getElementById('angle-button').addEventListener('click', async () => {
+            try {
+                const result = await postJson('/api/tapers/angle-to-ratio', {
+                    included_angle_deg: document.getElementById('included-angle').value
+                });
+                conversionResult.replaceChildren();
+                addResultLine(conversionResult, labels.ratio_result, `1:${numberFormat.format(result.ratio_denominator)}`);
+                addResultLine(conversionResult, labels.half_angle, `${numberFormat.format(result.half_angle_deg)}°`);
+                addResultLine(conversionResult, labels.included_angle, `${numberFormat.format(result.included_angle_deg)}°`);
+                document.getElementById('ratio-numerator').value = result.ratio_numerator.toFixed(6);
+                document.getElementById('ratio-denominator').value = result.ratio_denominator.toFixed(6);
+            } catch (error) {
+                showError(conversionResult, error);
+            }
+        });
+    </script>
+</body>
+</html>

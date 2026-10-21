@@ -20,6 +20,7 @@ from cutting_conditions import (
     DEFAULT_MACHINE_SPEEDS, MATERIALS, OPERATIONS, TOOLS,
     calculate_conditions, get_recommendations,
 )
+from tapers import MORSE_TAPERS, ISO_TAPERS, angle_to_ratio, calculate_taper, ratio_to_angle
 import math
 import re
 from fractions import Fraction
@@ -221,6 +222,109 @@ def cutting_conditions_en():
     return render_template('cutting_conditions.html', lang='en', labels=_CUTTING_LABELS['en'],
                            materials=MATERIALS, tools=TOOLS, operations=OPERATIONS,
                            defaults=DEFAULT_MACHINE_SPEEDS)
+
+_TAPER_LABELS = {
+    "cs": {
+        "title": "Kužely",
+        "description": "Výpočet kuželovitosti, úhlu, posuvu koníku, nastavení horních saní a kontrolních průměrů. Rozměry tabulek jsou v mm.",
+        "large_diameter": "Velký průměr D (mm)",
+        "small_diameter": "Malý průměr d (mm)",
+        "taper_length": "Délka kužele L (mm)",
+        "work_length": "Délka obrobku mezi hroty (mm)",
+        "calculate": "Vypočítat kužel",
+        "ratio": "Kuželovitost (poměr průměrů 1:n)",
+        "included_angle": "Vrcholový úhel kužele (°)",
+        "half_angle": "Poloviční úhel kužele (°)",
+        "diameter_difference": "Rozdíl průměrů D − d (mm)",
+        "tailstock_offset": "Posuv koníku (mm)",
+        "top_slide_angle": "Nastavení horních saní od osy (°)",
+        "check_dimensions": "Kontrolní rozměry",
+        "distance": "Vzdálenost od velkého konce (mm)",
+        "check_diameter": "Kontrolní průměr (mm)",
+        "ratio_converter": "Převod poměru a úhlu",
+        "ratio_numerator": "Čitatel poměru",
+        "ratio_denominator": "Jmenovatel poměru",
+        "convert_ratio": "Převést poměr na úhel",
+        "convert_angle": "Převést úhel na poměr",
+        "morse_table": "Morse kužely MT0–MT6 (ISO 296)",
+        "iso_table": "Kužely ISO 30, ISO 40 a ISO 50 (7:24)",
+        "taper_size": "Označení",
+        "large_end": "Velký průměr (mm)",
+        "diameter_change": "Změna průměru na délce 100 mm (mm)",
+        "reference_diameter": "Průměr 24 mm od roviny měrky (mm)",
+        "cone_ratio": "Poměr",
+        "reference_angle": "Vrcholový úhel (°)",
+        "angle": "Úhel",
+        "reference_note": "Morse: průměr A, poměr a úhel na stranu dle ISO 296. ISO: jmenovitý průměr v rovině měrky; druhý průměr je odvozen 24 mm směrem ke špičce z poměru 7:24. Ověřte podle konkrétní normy a provedení držáku.",
+        "calculation_note": "Posuv koníku předpokládá soustružení mezi hroty; délka obrobku je vzdálenost mezi hroty. Horní saně se nastavují na poloviční úhel.",
+        "required": "Zadejte všechny rozměry jako kladná čísla.",
+        "error": "Výpočet se nepodařil. Zkontrolujte zadané hodnoty.",
+        "back": "Zpět na hlavní stránku",
+        "result": "Výsledek",
+        "ratio_result": "Poměr",
+    },
+    "en": {
+        "title": "Tapers",
+        "description": "Calculate taper ratio, angle, tailstock offset, compound-slide setting and inspection diameters. Table dimensions are in mm.",
+        "large_diameter": "Large diameter D (mm)",
+        "small_diameter": "Small diameter d (mm)",
+        "taper_length": "Taper length L (mm)",
+        "work_length": "Workpiece length between centers (mm)",
+        "calculate": "Calculate taper",
+        "ratio": "Taper (diameter ratio 1:n)",
+        "included_angle": "Included cone angle (°)",
+        "half_angle": "Half angle (°)",
+        "diameter_difference": "Diameter difference D − d (mm)",
+        "tailstock_offset": "Tailstock offset (mm)",
+        "top_slide_angle": "Compound-slide setting from axis (°)",
+        "check_dimensions": "Inspection dimensions",
+        "distance": "Distance from large end (mm)",
+        "check_diameter": "Inspection diameter (mm)",
+        "ratio_converter": "Ratio and angle conversion",
+        "ratio_numerator": "Ratio numerator",
+        "ratio_denominator": "Ratio denominator",
+        "convert_ratio": "Convert ratio to angle",
+        "convert_angle": "Convert angle to ratio",
+        "morse_table": "Morse tapers MT0–MT6 (ISO 296)",
+        "iso_table": "ISO 30, ISO 40 and ISO 50 tapers (7:24)",
+        "taper_size": "Designation",
+        "large_end": "Large-end diameter (mm)",
+        "diameter_change": "Diameter change per 100 mm length (mm)",
+        "reference_diameter": "Diameter 24 mm from gauge line (mm)",
+        "cone_ratio": "Diameter taper",
+        "reference_angle": "Half-angle / included angle (°)",
+        "angle": "Angle",
+        "reference_note": "Morse: diameter A, taper ratio and half-angle per ISO 296. ISO: nominal diameter at gauge line; second diameter is derived 24 mm toward the nose using the 7:24 ratio. Check the applicable standard and holder design.",
+        "calculation_note": "Tailstock offset assumes turning between centers; workpiece length is the distance between centers. Set the compound slide to the half-angle.",
+        "required": "Enter all dimensions as positive numbers.",
+        "error": "Calculation failed. Check the entered values.",
+        "back": "Back to main menu",
+        "result": "Result",
+        "ratio_result": "Ratio",
+    },
+}
+
+def _taper_page(language):
+    morse_angles = [
+        ratio_to_angle(taper["ratio_denominator"]) for taper in MORSE_TAPERS
+    ]
+    return render_template(
+        'tapers.html',
+        lang=language,
+        labels=_TAPER_LABELS[language],
+        morse_tapers=MORSE_TAPERS,
+        taper_angles=morse_angles,
+        iso_tapers=ISO_TAPERS,
+        iso_angle=ratio_to_angle(24 / 7),
+    )
+
+@app.route('/tapers')
+def tapers():
+    return _taper_page('cs')
+
+@app.route('/en/tapers')
+def tapers_en():
+    return _taper_page('en')
 
 @app.route('/triangles')
 def triangles():
@@ -750,6 +854,41 @@ def calculate_cutting_conditions():
             machine_speeds=speed_values,
             teeth=safe_int(data.get("teeth", 1), "teeth"),
         )
+        return jsonify({"success": True, **result})
+    except (ValueError, TypeError) as error:
+        return jsonify({"success": False, "error": str(error)}), 400
+
+@app.route('/api/tapers/calculate', methods=['POST'])
+def calculate_taper_api():
+    data = request.get_json(silent=True) or {}
+    try:
+        result = calculate_taper(
+            large_diameter=safe_float(data.get('large_diameter'), 'large_diameter'),
+            small_diameter=safe_float(data.get('small_diameter'), 'small_diameter'),
+            taper_length=safe_float(data.get('taper_length'), 'taper_length'),
+            work_length=safe_float(data.get('work_length'), 'work_length'),
+        )
+        return jsonify({"success": True, **result})
+    except (ValueError, TypeError) as error:
+        return jsonify({"success": False, "error": str(error)}), 400
+
+@app.route('/api/tapers/ratio-to-angle', methods=['POST'])
+def taper_ratio_to_angle_api():
+    data = request.get_json(silent=True) or {}
+    try:
+        result = ratio_to_angle(
+            denominator=safe_float(data.get('ratio_denominator'), 'ratio_denominator'),
+            numerator=safe_float(data.get('ratio_numerator', 1), 'ratio_numerator'),
+        )
+        return jsonify({"success": True, **result})
+    except (ValueError, TypeError) as error:
+        return jsonify({"success": False, "error": str(error)}), 400
+
+@app.route('/api/tapers/angle-to-ratio', methods=['POST'])
+def taper_angle_to_ratio_api():
+    data = request.get_json(silent=True) or {}
+    try:
+        result = angle_to_ratio(safe_float(data.get('included_angle_deg'), 'included_angle_deg'))
         return jsonify({"success": True, **result})
     except (ValueError, TypeError) as error:
         return jsonify({"success": False, "error": str(error)}), 400
