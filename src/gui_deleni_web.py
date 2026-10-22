@@ -923,4 +923,37 @@ def calculate_mixing():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)from hardness_conversion import (
+    METAL_REFERENCE_MATERIALS,
+    convert_hardness,
+)
+
+@app.route('/hardness')
+def hardness():
+    return render_template(
+        'hardness.html',
+        metal_materials=METAL_REFERENCE_MATERIALS,
+    )
+
+
+@app.route('/en/hardness')
+def hardness_en():
+    return render_template(
+        'hardness_en.html',
+        metal_materials=METAL_REFERENCE_MATERIALS,
+    )
+
+@app.route('/api/hardness/convert', methods=['POST'])
+def convert_hardness_api():
+    data = request.get_json(silent=True) or {}
+    try:
+        value = safe_float(data.get('value'), 'value')
+        scale = data.get('scale')
+        if not isinstance(scale, str):
+            raise ValueError('Scale must be HRC, HB, or HV')
+        conversion = convert_hardness(value, scale.upper())
+        return jsonify({'success': True, 'input_value': value, 'input_scale': scale.upper(), **conversion})
+    except (ValueError, TypeError) as error:
+        return jsonify({'success': False, 'error': str(error)}), 400
+
+

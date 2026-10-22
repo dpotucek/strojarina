@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardness Conversion</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: url('/static/data/staraDilna.png') center center fixed; background-size: cover; min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .lang-switcher { text-align: right; margin-bottom: 20px; }
+        .lang-switcher a, .back-link { color: #007bff; text-decoration: none; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        input { width: 160px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: 0; border-radius: 4px; cursor: pointer; }
+        .note { padding: 12px; background: #fff3cd; border-radius: 4px; color: #664d03; }
+        .results { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 40px; }
+        .table-wrap { overflow-x: auto; margin: 12px 0 28px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; }
+        th { background: #e9ecef; }
+        .navigation { margin: 24px auto; text-align: center; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="lang-switcher"><a href="/hardness">CZ</a> | <a href="/en/hardness"><strong>EN</strong></a></div>
+        <h1>HRC, HB and HV Hardness Conversion</h1>
+        <p>Approximate conversion between hardness scales. Enter a value and the scale to convert from. HRC means Rockwell hardness, C scale; HB means Brinell hardness; and HV means Vickers hardness.</p>
+        <div class="form-group">
+            <label for="hardness-value">Hardness value:</label>
+            <input id="hardness-value" type="number" min="0" step="any" value="40">
+        </div>
+        <div class="form-group">
+            <label for="hardness-scale">Input scale:</label>
+            <select id="hardness-scale">
+                <option value="HRC" selected>HRC</option>
+                <option value="HB">HB</option>
+                <option value="HV">HV</option>
+            </select>
+        </div>
+        <button type="button" onclick="convertHardness()">Convert</button>
+        <div id="hardness-results" class="results" aria-live="polite">Enter a value and click Convert.</div>
+        <p class="note"><strong>Note:</strong> This is an approximate linear interpolation of reference steel conversion tables based on ASTM E140. It applies only to HRC 20–68 (approximately HB 226–818 and HV 238–940). Results for other materials or values outside this range are not reliable; use the appropriate test method.</p>
+
+        <h2>Indicative hardness of metallic materials</h2>
+        <p>Typical values vary with composition, heat treatment, and product form. HRC is not commonly used for soft metals.</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Material</th><th>HRC</th><th>HB</th><th>HV</th></tr></thead>
+                <tbody>
+                    {% for material in metal_materials %}
+                    <tr><td>{{ material.name_en }}</td><td>{{ material.hrc|default('N/A', true) }}</td><td>{{ material.hb|default('N/A', true) }}</td><td>{{ material.hv|default('N/A', true) }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="navigation"><a class="back-link" href="/en">&larr; Back to main menu</a></div>
+    </main>
+    <script>
+        async function convertHardness() {
+            const value = document.getElementById('hardness-value').value;
+            const scale = document.getElementById('hardness-scale').value;
+            const results = document.getElementById('hardness-results');
+            if (!value) {
+                results.textContent = 'Enter a numeric hardness value.';
+                return;
+            }
+            try {
+                const response = await fetch('/api/hardness/convert', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({value: Number(value), scale})
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+                results.innerHTML = `<strong>Approximate conversion:</strong> HRC ${data.HRC} &nbsp;|&nbsp; HB ${data.HB} &nbsp;|&nbsp; HV ${data.HV}`;
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
