@@ -17,6 +17,8 @@ class TestTaperCalculations(unittest.TestCase):
         english = self.client.get("/en/tapers")
         self.assertEqual(czech.status_code, 200)
         self.assertIn("Kužely".encode(), czech.data)
+        self.assertIn(b'/static/data/KuzelyGeometrie.png', czech.data)
+        self.assertIn("Délka kužele l (mm)".encode(), czech.data)
         self.assertIn("Poměr".encode(), czech.data)
         self.assertIn("Velký průměr (mm)".encode(), czech.data)
         self.assertIn("Vrcholový úhel (°)".encode(), czech.data)
@@ -25,7 +27,11 @@ class TestTaperCalculations(unittest.TestCase):
         self.assertIn(b'id="ratio-numerator"', czech.data)
         self.assertEqual(english.status_code, 200)
         self.assertIn(b"Tapers", english.data)
+        self.assertIn(b"Taper length l (mm)", english.data)
         self.assertIn(b"gauge line", english.data)
+        image = self.client.get("/static/data/KuzelyGeometrie.png")
+        self.assertEqual(image.status_code, 200)
+        self.assertEqual(image.mimetype, "image/png")
 
     def test_reference_dimensions_cover_requested_standard_sizes(self):
         self.assertEqual([row["name"] for row in MORSE_TAPERS], [f"MT{i}" for i in range(7)])

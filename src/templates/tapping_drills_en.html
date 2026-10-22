@@ -12,15 +12,13 @@
             background-size: cover;
             min-height: 100vh;
         }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .lang-switcher { text-align: right; margin-bottom: 20px; }
         .lang-switcher a { margin: 0 5px; color: #007bff; text-decoration: none; }
         .lang-switcher a.active { font-weight: bold; color: #333; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        input { width: 150px; }
-        select { width: 170px; }
+        select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; max-width: 100%; }
         button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background: #0056b3; }
         .results { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 100px; }
@@ -29,6 +27,11 @@
         .back-link a:hover { text-decoration: underline; }
         .description { margin-bottom: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; color: #495057; }
         .strength-info { margin-top: 10px; padding: 10px; background: #d1ecf1; border-radius: 4px; font-size: 14px; }
+        .table-wrap { overflow-x: auto; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; white-space: nowrap; font-size: 14px; }
+        th, td { border: 1px solid #dee2e6; padding: 6px 8px; text-align: right; }
+        th:first-child, td:first-child { text-align: left; }
+        thead { background: #e9ecef; }
     </style>
 </head>
 <body>
@@ -47,13 +50,19 @@
         </div>
         
         <div class="form-group">
-            <label>Thread diameter (mm):</label>
-            <input type="text" inputmode="decimal" id="thread-diameter" value="6" step="0.1" min="1">
-        </div>
-        
-        <div class="form-group">
-            <label>Thread pitch (mm):</label>
-            <input type="text" inputmode="decimal" id="thread-pitch" value="1.0" step="0.1" min="0.1">
+            <label for="thread-id">Thread:</label>
+            <select id="thread-id">
+                <optgroup label="Metric threads">
+                    {% for thread in metric_threads %}
+                    <option value="{{ thread.id }}" {% if thread.name == 'M6 Coarse' %}selected{% endif %}>{{ thread.name }} — Ø {{ '%.3f'|format(thread.diameter_mm) }} mm, pitch {{ '%.3f'|format(thread.pitch_mm) }} mm</option>
+                    {% endfor %}
+                </optgroup>
+                <optgroup label="Inch threads">
+                    {% for thread in inch_threads %}
+                    <option value="{{ thread.id }}">{{ thread.name }} — Ø {{ '%.4f'|format(thread.diameter_mm / 25.4) }} in, {{ '%.3f'|format(thread.pitch_mm) }} mm pitch</option>
+                    {% endfor %}
+                </optgroup>
+            </select>
         </div>
         
         <div class="form-group">
@@ -77,27 +86,31 @@
         <div id="results" class="results">
             <p>Enter parameters and click Calculate</p>
         </div>
+
+        <h2>Metric thread drill table</h2>
+        <p>Drill diameters in mm, calculated according to tappingDrills.py.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Thread</th><th>Diameter (mm)</th><th>Pitch (mm)</th><th>Core (mm)</th>{% for strength in strength_values %}<th>{{ strength }}%</th>{% endfor %}</tr>
+                </thead>
+                <tbody>
+                    {% for thread in metric_drill_table %}
+                    <tr><td>{{ thread.name }}</td><td>{{ '%.2f'|format(thread.diameter_mm) }}</td><td>{{ '%.2f'|format(thread.pitch_mm) }}</td><td>{{ thread.core_mm|default('—', true) }}</td>{% for drill in thread.drills %}<td>{{ drill }}</td>{% endfor %}</tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script src="/static/fraction-input.js"></script>
     <script>
         async function calculateTappingDrill() {
-            const threadDiameter = document.getElementById('thread-diameter').value;
-            const threadPitch = document.getElementById('thread-pitch').value;
+            const threadId = document.getElementById('thread-id').value;
             const threadStrength = document.getElementById('thread-strength').value;
             
-            if (!threadDiameter || !threadPitch || !threadStrength) {
-                alert('Enter all parameters');
-                return;
-            }
-            
-            if (parseFlexibleNumber(threadDiameter) <= 0 || parseFlexibleNumber(threadPitch) <= 0) {
-                alert('Diameter and pitch must be greater than 0');
-                return;
-            }
-            
-            if (parseFlexibleNumber(threadStrength) < 20 || parseFlexibleNumber(threadStrength) > 100) {
-                alert('Thread strength must be between 20% and 100%');
+            if (!threadId || !threadStrength) {
+                alert('Select a thread and thread strength');
                 return;
             }
             
@@ -106,8 +119,7 @@
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        thread_diameter: parseFlexibleNumber(threadDiameter),
-                        thread_pitch: parseFlexibleNumber(threadPitch),
+                        thread_id: parseInt(threadId, 10),
                         thread_strength: parseFlexibleNumber(threadStrength)
                     })
                 });
@@ -121,10 +133,12 @@
                 
                 if (data.success) {
                     html = `<h3>Calculation Results:</h3>`;
-                    html += `<p><strong>Thread:</strong> M${data.thread_diameter} × ${data.thread_pitch}</p>`;
+                    html += `<p><strong>Thread:</strong> ${data.thread_name}</p>`;
                     html += `<p><strong>Thread strength:</strong> ${data.thread_strength}%</p>`;
                     html += `<hr>`;
-                    html += `<p style="color: #007bff; font-size: 18px;"><strong>Drill diameter:</strong> ${data.drill_diameter} mm</p>`;
+                    html += `<p style="color: #007bff; font-size: 18px;"><strong>Drill diameter:</strong> ${data.drill_diameter_mm} mm`;
+                    if (data.unit === 'in') html += ` (${data.drill_diameter_in} in)`;
+                    html += `</p>`;
                     
                     if (data.thread_strength > 80) {
                         html += `<p style="color: #856404; background: #fff3cd; padding: 8px; border-radius: 4px; margin-top: 10px;">`;

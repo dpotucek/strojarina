@@ -21,6 +21,16 @@ from cutting_conditions import (
     calculate_conditions, get_recommendations,
 )
 from tapers import MORSE_TAPERS, ISO_TAPERS, angle_to_ratio, calculate_taper, ratio_to_angle
+from hardness_conversion import (
+    METAL_REFERENCE_MATERIALS,
+    convert_hardness,
+)
+from dilution_tables import (
+    DILUTION_VOLUMES_ML,
+    DILUTION_WATER_TABLE,
+    MIXING_COMPONENTS_TABLE,
+    MIXING_VOLUMES_L,
+)
 import math
 import re
 from fractions import Fraction
@@ -148,6 +158,22 @@ def material_bending():
 def material_bending_en():
     return render_template('material_bending_en.html')
 
+
+@app.route('/hardness')
+def hardness():
+    return render_template(
+        'hardness.html',
+        metal_materials=METAL_REFERENCE_MATERIALS,
+    )
+
+
+@app.route('/en/hardness')
+def hardness_en():
+    return render_template(
+        'hardness_en.html',
+        metal_materials=METAL_REFERENCE_MATERIALS,
+    )
+
 @app.route('/pulleys')
 def pulleys():
     return render_template('pulleys.html')
@@ -166,11 +192,54 @@ def sine_bar_en():
 
 @app.route('/tapping-drills')
 def tapping_drills():
-    return render_template('tapping_drills.html')
+    return render_template('tapping_drills.html', **get_tapping_drill_page_data())
 
 @app.route('/en/tapping-drills')
 def tapping_drills_en():
-    return render_template('tapping_drills_en.html')
+    return render_template('tapping_drills_en.html', **get_tapping_drill_page_data())
+
+
+def get_tapping_drill_page_data():
+    pool = ThreadPool()
+    threads = []
+    for thread_id, thread in enumerate(pool.threadBin):
+        diameter = thread.diaMM
+        pitch = thread.pitchMM
+        if (not isinstance(diameter, (int, float)) or not isinstance(pitch, (int, float))
+                or not math.isfinite(diameter) or not math.isfinite(pitch)
+                or diameter <= 0 or pitch <= 0):
+            continue
+        if thread.is_metric() and 'HOLTZ' in thread.name:
+            continue
+        threads.append({
+            'id': thread_id,
+            'name': thread.name,
+            'diameter_mm': diameter,
+            'pitch_mm': pitch,
+            'core_mm': thread.coreMM,
+            'is_metric': thread.is_metric(),
+        })
+
+    metric_threads = sorted(
+        (thread for thread in threads if thread['is_metric']),
+        key=lambda thread: (thread['diameter_mm'], thread['pitch_mm'], thread['name']),
+    )
+    strength_values = MetricThread.sily
+    metric_drill_table = []
+    for thread in metric_threads:
+        metric_drill_table.append({
+            **thread,
+            'drills': [
+                f"{MetricThread.countTapDrillSingle(thread['diameter_mm'], thread['pitch_mm'], strength):.2f}"
+                for strength in strength_values
+            ],
+        })
+    return {
+        'metric_threads': metric_threads,
+        'inch_threads': [thread for thread in threads if not thread['is_metric']],
+        'strength_values': strength_values,
+        'metric_drill_table': metric_drill_table,
+    }
 
 _CUTTING_LABELS = {
     "cs": {
@@ -229,7 +298,7 @@ _TAPER_LABELS = {
         "description": "Výpočet kuželovitosti, úhlu, posuvu koníku, nastavení horních saní a kontrolních průměrů. Rozměry tabulek jsou v mm.",
         "large_diameter": "Velký průměr D (mm)",
         "small_diameter": "Malý průměr d (mm)",
-        "taper_length": "Délka kužele L (mm)",
+        "taper_length": "Délka kužele l (mm)",
         "work_length": "Délka obrobku mezi hroty (mm)",
         "calculate": "Vypočítat kužel",
         "ratio": "Kuželovitost (poměr průměrů 1:n)",
@@ -268,7 +337,7 @@ _TAPER_LABELS = {
         "description": "Calculate taper ratio, angle, tailstock offset, compound-slide setting and inspection diameters. Table dimensions are in mm.",
         "large_diameter": "Large diameter D (mm)",
         "small_diameter": "Small diameter d (mm)",
-        "taper_length": "Taper length L (mm)",
+        "taper_length": "Taper length l (mm)",
         "work_length": "Workpiece length between centers (mm)",
         "calculate": "Calculate taper",
         "ratio": "Taper (diameter ratio 1:n)",
@@ -336,11 +405,23 @@ def triangles_en():
 
 @app.route('/redeni')
 def redeni():
-    return render_template('redeni.html')
+    return render_template(
+        'redeni.html',
+        dilution_volumes_ml=DILUTION_VOLUMES_ML,
+        dilution_water_table=DILUTION_WATER_TABLE,
+        mixing_volumes_l=MIXING_VOLUMES_L,
+        mixing_components_table=MIXING_COMPONENTS_TABLE,
+    )
 
 @app.route('/en/solution-dilution')
 def solution_dilution_en():
-    return render_template('redeni_en.html')
+    return render_template(
+        'redeni_en.html',
+        dilution_volumes_ml=DILUTION_VOLUMES_ML,
+        dilution_water_table=DILUTION_WATER_TABLE,
+        mixing_volumes_l=MIXING_VOLUMES_L,
+        mixing_components_table=MIXING_COMPONENTS_TABLE,
+    )
 
 @app.route('/api/pocty', methods=['POST'])
 def vypocitat_pocty():
@@ -618,6 +699,20 @@ def calculate_material_bending():
     
     return jsonify(result)
 
+@app.route('/api/hardness/convert', methods=['POST'])
+def convert_hardness_api():
+    data = request.get_json(silent=True) or {}
+    try:
+        value = safe_float(data.get('value'), 'value')
+        scale = data.get('scale')
+        if not isinstance(scale, str):
+            raise ValueError('Scale must be HRC, HB, or HV')
+        conversion = convert_hardness(value, scale.upper())
+        return jsonify({'success': True, 'input_value': value, 'input_scale': scale.upper(), **conversion})
+    except (ValueError, TypeError) as error:
+        return jsonify({'success': False, 'error': str(error)}), 400
+
+
 @app.route('/api/pulleys', methods=['POST'])
 def calculate_pulleys():
     data = request.json
@@ -706,28 +801,54 @@ def calculate_sine_bar():
 
 @app.route('/api/tapping-drills', methods=['POST'])
 def calculate_tapping_drill():
-    data = request.json
-    thread_diameter = safe_float(data.get('thread_diameter'), 'thread_diameter')
-    thread_pitch = safe_float(data.get('thread_pitch'), 'thread_pitch')
-    thread_strength = safe_float(data.get('thread_strength', 75), 'thread_strength')
-    
+    data = request.get_json(silent=True) or {}
     try:
-        drill_diameter = MetricThread.countTapDrillSingle(thread_diameter, thread_pitch, thread_strength)
-        
+        thread_strength = safe_float(data.get('thread_strength', 75), 'thread_strength')
+        if not 20 < thread_strength <= 100:
+            raise ValueError('Thread strength must be greater than 20% and at most 100%')
+
+        if 'thread_id' in data:
+            thread_id = safe_int(data.get('thread_id'), 'thread_id')
+            pool = ThreadPool()
+            if thread_id < 0 or thread_id >= len(pool.threadBin):
+                raise ValueError('Unknown thread')
+            thread = pool.threadBin[thread_id]
+            if (not isinstance(thread.diaMM, (int, float))
+                    or not isinstance(thread.pitchMM, (int, float))
+                    or not math.isfinite(thread.diaMM) or not math.isfinite(thread.pitchMM)
+                    or thread.diaMM <= 0 or thread.pitchMM <= 0):
+                raise ValueError('Selected thread does not have usable diameter and pitch data')
+            if thread.is_metric() and 'HOLTZ' in thread.name:
+                raise ValueError('Unknown thread')
+            thread_name = thread.name
+            thread_diameter = thread.diaMM
+            thread_pitch = thread.pitchMM
+            unit = 'mm' if thread.is_metric() else 'in'
+        else:
+            thread_diameter = safe_float(data.get('thread_diameter'), 'thread_diameter')
+            thread_pitch = safe_float(data.get('thread_pitch'), 'thread_pitch')
+            if thread_diameter <= 0 or thread_pitch <= 0:
+                raise ValueError('Thread diameter and pitch must be greater than 0')
+            thread_name = None
+            unit = 'mm'
+
+        drill_diameter = MetricThread.countTapDrillSingle(
+            thread_diameter, thread_pitch, thread_strength
+        )
         result = {
             'success': True,
+            'thread_name': thread_name,
             'thread_diameter': thread_diameter,
             'thread_pitch': thread_pitch,
             'thread_strength': thread_strength,
-            'drill_diameter': round(drill_diameter, 3)
+            'unit': unit,
+            'drill_diameter': round(drill_diameter, 3),
+            'drill_diameter_mm': round(drill_diameter, 3),
+            'drill_diameter_in': round(drill_diameter / 25.4, 4),
         }
-    except Exception as e:
-        result = {
-            'success': False,
-            'error': str(e)
-        }
-    
-    return jsonify(result)
+        return jsonify(result)
+    except (ValueError, TypeError) as error:
+        return jsonify({'success': False, 'error': str(error)}), 400
 
 @app.route('/api/triangles/right', methods=['POST'])
 def calculate_right_triangle():
@@ -923,37 +1044,4 @@ def calculate_mixing():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)from hardness_conversion import (
-    METAL_REFERENCE_MATERIALS,
-    convert_hardness,
-)
-
-@app.route('/hardness')
-def hardness():
-    return render_template(
-        'hardness.html',
-        metal_materials=METAL_REFERENCE_MATERIALS,
-    )
-
-
-@app.route('/en/hardness')
-def hardness_en():
-    return render_template(
-        'hardness_en.html',
-        metal_materials=METAL_REFERENCE_MATERIALS,
-    )
-
-@app.route('/api/hardness/convert', methods=['POST'])
-def convert_hardness_api():
-    data = request.get_json(silent=True) or {}
-    try:
-        value = safe_float(data.get('value'), 'value')
-        scale = data.get('scale')
-        if not isinstance(scale, str):
-            raise ValueError('Scale must be HRC, HB, or HV')
-        conversion = convert_hardness(value, scale.upper())
-        return jsonify({'success': True, 'input_value': value, 'input_scale': scale.upper(), **conversion})
-    except (ValueError, TypeError) as error:
-        return jsonify({'success': False, 'error': str(error)}), 400
-
-
+    app.run(host='0.0.0.0', port=5000, debug=True)

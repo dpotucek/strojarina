@@ -13,6 +13,7 @@
         .description, .note { padding: 12px 15px; border-radius: 5px; margin: 15px 0; }
         .description { background: #e9ecef; color: #495057; }
         .note { background: #fff3cd; color: #664d03; }
+        .geometry-image { display: block; max-width: 100%; height: auto; margin: 16px auto; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
         input { box-sizing: border-box; width: 100%; padding: 9px; border: 1px solid #ced4da; border-radius: 4px; }
@@ -34,6 +35,7 @@
             <a href="/en/tapers" class="{{ 'active' if lang == 'en' else '' }}">EN</a>
         </div>
         <h1>{{ labels.title }}</h1>
+        <img class="geometry-image" src="/static/data/KuzelyGeometrie.png" alt="{{ 'Geometrie kužele' if lang == 'cs' else 'Taper geometry' }}">
         <p class="description">{{ labels.description }}</p>
 
         <section>

@@ -44,6 +44,12 @@
         .error { background: #f8d7da; border-left-color: #dc3545; color: #721c24; }
         .info-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
         .info-box h4 { margin-top: 0; color: #856404; }
+        .reference-tables { margin-top: 32px; }
+        .table-wrap { overflow-x: auto; margin: 12px 0 28px; }
+        table { border-collapse: collapse; background: white; white-space: nowrap; font-size: 14px; }
+        th, td { border: 1px solid #dee2e6; padding: 8px; text-align: right; }
+        th:first-child, td:first-child { text-align: left; }
+        th { background: #e9ecef; }
     </style>
 </head>
 <body>
@@ -116,6 +122,35 @@
             
             <div id="mixingResult"></div>
         </div>
+
+        <section class="reference-tables">
+            <h2>Tabulky pro cílovou koncentraci 40 %</h2>
+            <h3>Voda potřebná k naředění alkoholu</h3>
+            <p>Objem vody v ml, který se přidá k uvedenému objemu alkoholu, aby výsledná koncentrace byla 40 %.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Počáteční koncentrace</th>{% for volume in dilution_volumes_ml %}<th>{{ volume }} ml alkoholu</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for concentration, amounts in dilution_water_table %}
+                        <tr><th>{{ concentration }}</th>{% for amount in amounts %}<td>{{ amount }}</td>{% endfor %}</tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Alkohol a voda pro požadovaný výsledný objem</h3>
+            <p>Objemy v ml ve formátu alkohol + voda. Výsledný roztok má koncentraci 40 %.</p>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Počáteční koncentrace</th>{% for volume in mixing_volumes_l %}<th>{{ volume }} l</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for concentration, amounts in mixing_components_table %}
+                        <tr><th>{{ concentration }}</th>{% for amount in amounts %}<td>{{ amount }}</td>{% endfor %}</tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
     
     <script src="/static/fraction-input.js"></script>
