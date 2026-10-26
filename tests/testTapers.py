@@ -4,7 +4,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src"))
 
-from gui_deleni_web import app
+from flask_app import app
 from tapers import ISO_TAPERS, MORSE_TAPERS, angle_to_ratio, calculate_taper, ratio_to_angle
 
 

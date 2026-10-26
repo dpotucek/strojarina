@@ -5,7 +5,7 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../DaPTools/src"))
 
-from gui_deleni_web import app
+from flask_app import app
 
 
 class TestDifferentialThreadWeb(unittest.TestCase):

@@ -72,7 +72,7 @@ strojarina/
 │   ├── DivisionPlatePlain.py # Division plate calculations
 │   ├── findThread.py      # Thread database search
 │   ├── triangles.py       # Triangle calculations with advanced geometry
-│   ├── gui_deleni_web.py  # Web GUI Flask server with REST API
+│   ├── flask_app.py       # Web GUI Flask server with REST API
 │   ├── apiExample.py      # API integration examples
 │   └── templates/         # HTML templates for web GUI
 ├── tests/                 # Unit tests
@@ -94,6 +94,7 @@ strojarina/
 - **Consistent styling** across all tools with responsive design
 - **Input validation** and user-friendly error messages
 - **REST API endpoints** for all calculations
+- **GUI architecture and integration guide:** [README.GUI.md](README.GUI.md)
 
 ### Division Head Calculator
 - **Ratio selection:** Dělicí hlava (40) or Stůl (120)
@@ -300,7 +301,7 @@ docker run --rm strojarina:latest python3 tests/testTriangles.py
 poetry install
 
 # Run web server
-poetry run python src/gui_deleni_web.py
+poetry run python src/flask_app.py
 ```
 
 ### Inside Container

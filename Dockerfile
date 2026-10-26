@@ -19,8 +19,8 @@ COPY pyproject.toml poetry.lock ./
 # Configure poetry
 RUN poetry config virtualenvs.create false
 
-# Install dependencies
-RUN poetry install --only=main
+# Install application and test dependencies (pytest is required by `make test`)
+RUN poetry install --with dev
 
 # Copy source code
 COPY . .
@@ -32,4 +32,4 @@ ENV PYTHONPATH=/app/src:/app
 EXPOSE 5000
 
 # Default command
-CMD ["python", "src/gui_deleni_web.py"]
+CMD ["python", "src/flask_app.py"]

@@ -9,7 +9,7 @@ make web
 # Server běží na http://localhost:5000
 
 # Nebo manuálně
-python src/gui_deleni_web.py
+python src/flask_app.py
 ```
 
 ### 2. Instalace závislostí pro klienta

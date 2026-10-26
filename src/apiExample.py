@@ -4,7 +4,7 @@ API Example - Demonstrace použití Strojarina REST API
 Ukázky volání všech dostupných API endpointů pro integraci s jinými programy
 
 Konfigurace:
-1. Spusť Strojarina server: make web (nebo python src/gui_deleni_web.py)
+1. Spusť Strojarina server: make web (nebo python src/flask_app.py)
 2. Server běží na http://localhost:5000
 3. Nainstaluj requests: pip install requests
 4. Spusť tento soubor: python src/apiExample.py
@@ -67,7 +67,7 @@ def test_api_connection():
         return False
     else:
         print("✗ Nelze se připojit k API serveru")
-        print("  Spusťte server: make web nebo python src/gui_deleni_web.py")
+        print("  Spusťte server: make web nebo python src/flask_app.py")
         return False
 
 def triangle_right_api_example():

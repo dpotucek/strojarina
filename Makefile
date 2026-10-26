@@ -11,8 +11,8 @@ run:
 	docker run -it --rm strojarina:latest bash
 
 # Run tests in container
-test:
-	docker run --rm strojarina:latest python -m pytest tests/ || echo "No tests found"
+test: build
+	docker run --rm strojarina:latest python -m pytest tests/
 
 # Aktualizuje DaPTools a rebuilduje kontejner
 update-daptools:

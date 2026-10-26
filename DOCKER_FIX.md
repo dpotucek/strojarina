@@ -57,7 +57,7 @@ docker run --rm strojarina:latest python3 tests/testTriangles.py
 # Test web interface
 make web
 # or
-docker run --rm -p 5000:5000 strojarina:latest python3 src/gui_deleni_web.py
+docker run --rm -p 5000:5000 strojarina:latest python3 src/flask_app.py
 ```
 
 ## Results

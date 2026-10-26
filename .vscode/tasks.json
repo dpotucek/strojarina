@@ -43,7 +43,7 @@
             "label": "Start Web Server",
             "type": "shell",
             "command": "python3",
-            "args": ["src/gui_deleni_web.py"],
+            "args": ["src/flask_app.py"],
             "group": "build",
             "presentation": {
                 "echo": true,
